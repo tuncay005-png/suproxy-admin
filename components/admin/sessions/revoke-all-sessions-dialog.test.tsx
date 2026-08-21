@@ -186,9 +186,9 @@ describe('RevokeAllSessionsDialog', () => {
       success: true,
       data: {
         sessions: [
-          { id: '1', user_id: 'user-123', email: 'test@example.com', username: 'test', ip_address: '127.0.0.1', user_agent: 'Chrome', created_at: '2024-01-01', last_activity_at: '2024-01-01', expires_at: '2024-01-02' },
-          { id: '2', user_id: 'user-123', email: 'test@example.com', username: 'test', ip_address: '127.0.0.1', user_agent: 'Chrome', created_at: '2024-01-01', last_activity_at: '2024-01-01', expires_at: '2024-01-02' },
-          { id: '3', user_id: 'other-user', email: 'other@example.com', username: 'other', ip_address: '127.0.0.1', user_agent: 'Chrome', created_at: '2024-01-01', last_activity_at: '2024-01-01', expires_at: '2024-01-02' },
+          { id: '1', user_id: 'user-123', email: 'test@example.com', username: 'test', device_name: 'Test Device', platform: 'Chrome', ip_address: '127.0.0.1', user_agent: 'Chrome', created_at: '2024-01-01', last_activity_at: '2024-01-01', expires_at: '2024-01-02' },
+          { id: '2', user_id: 'user-123', email: 'test@example.com', username: 'test', device_name: 'Test Device 2', platform: 'Firefox', ip_address: '127.0.0.1', user_agent: 'Chrome', created_at: '2024-01-01', last_activity_at: '2024-01-01', expires_at: '2024-01-02' },
+          { id: '3', user_id: 'other-user', email: 'other@example.com', username: 'other', device_name: 'Other Device', platform: 'Safari', ip_address: '127.0.0.1', user_agent: 'Chrome', created_at: '2024-01-01', last_activity_at: '2024-01-01', expires_at: '2024-01-02' },
         ],
         total: 3,
       },

@@ -223,52 +223,56 @@ export function InboundCreationForm() {
               )}
             />
 
-            {/* Requirement 5.3, 5.9, 9.2: Port input field */}
-            <FormField
-              control={form.control}
-              name="port"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Port</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="443"
-                      disabled={isSubmitting}
-                      {...field}
-                      onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Port number (1-65535) where the inbound will listen
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Port and Tag fields (side by side on tablet) */}
+            {/* Tablet optimization: 2-column layout at md: breakpoint (768px) */}
+            <div className="grid gap-4 md:grid-cols-2">
+              {/* Requirement 5.3, 5.9, 9.2: Port input field */}
+              <FormField
+                control={form.control}
+                name="port"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Port</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="443"
+                        disabled={isSubmitting}
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Port number (1-65535) where the inbound will listen
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* Requirement 5.3, 5.9, 9.2: Tag input field */}
-            <FormField
-              control={form.control}
-              name="tag"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tag</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="main-inbound"
-                      disabled={isSubmitting}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Unique identifier (alphanumeric, hyphens, underscores only)
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              {/* Requirement 5.3, 5.9, 9.2: Tag input field */}
+              <FormField
+                control={form.control}
+                name="tag"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tag</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="main-inbound"
+                        disabled={isSubmitting}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Unique identifier (alphanumeric, hyphens, underscores only)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Requirement 13.9, 13.10, 14.3: Display loading state during submission */}
             <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:gap-4">

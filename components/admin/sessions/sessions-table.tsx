@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Sessions Table Component
  * 
  * Displays active user sessions in a responsive table format.
@@ -115,7 +115,7 @@ export function SessionsTable({ sessions }: SessionsTableProps) {
             </TableHeader>
             <TableBody>
               {sessions.map((session) => {
-                const browser = parseUserAgent(session.user_agent);
+                const browser = parseUserAgent(session.user_agent || '');
                 const isCurrentSession = false; // TODO: Determine current session
                 
                 return (
@@ -147,15 +147,15 @@ export function SessionsTable({ sessions }: SessionsTableProps) {
                     </TableCell>
                     <TableCell className="hidden lg:table-cell text-muted-foreground">
                       <div className="flex flex-col">
-                        <span className="text-sm" title={formatDateTime(session.last_activity_at)}>
-                          {formatRelativeTime(session.last_activity_at)}
+                        <span className="text-sm" title={session.last_activity_at ? formatDateTime(session.last_activity_at) : 'Never'}>
+                          {session.last_activity_at ? formatRelativeTime(session.last_activity_at) : 'Never'}
                         </span>
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
                       <RevokeSessionButton 
                         sessionId={session.id}
-                        username={session.username}
+                        username={session.device_name || session.username || "Unknown Device"}
                         isCurrentSession={isCurrentSession}
                       />
                     </TableCell>
@@ -169,3 +169,5 @@ export function SessionsTable({ sessions }: SessionsTableProps) {
     </Card>
   );
 }
+
+

@@ -168,6 +168,7 @@ export class ApiError extends Error implements ApiErrorType {
  */
 class ApiClient {
   private baseURL: string;
+  private refreshPromise: Promise<boolean> | null = null;
 
   constructor() {
     // Detect if running server-side or client-side
@@ -194,7 +195,8 @@ class ApiClient {
    */
   private async request<T>(
     endpoint: string,
-    options?: RequestInit
+    options?: RequestInit,
+    _isRetryAfterRefresh = false
   ): Promise<T> {
     // Construct the full URL
     let url: string;
@@ -242,6 +244,58 @@ class ApiClient {
         credentials: isServerSide ? 'include' : 'include', // Include cookies for session management
         headers,
       });
+
+
+      // Client-side 401 handling with automatic refresh (max 1 retry)
+      if (!response.ok && response.status === 401 && typeof window !== 'undefined' && !endpoint.includes('/api/auth/refresh') && !_isRetryAfterRefresh) {
+        console.log('[API-CLIENT] 401 detected, attempting refresh...');
+        
+        // Single-flight mutex: wait if refresh already in progress
+        if (this.refreshPromise) {
+          console.log('[API-CLIENT] Refresh already in progress, waiting...');
+          const success = await this.refreshPromise;
+          if (success) {
+            console.log('[API-CLIENT] Retrying after completed refresh');
+            return this.request<T>(endpoint, options, true);
+          }
+        } else {
+          // Start new refresh
+          this.refreshPromise = (async () => {
+            try {
+              console.log('[API-CLIENT] Calling refresh endpoint...');
+              const refreshResponse = await fetch('/api/auth/refresh', {
+                method: 'POST',
+                credentials: 'include',
+              });
+              
+              if (refreshResponse.ok) {
+                console.log('[API-CLIENT] Refresh successful');
+                return true;
+              } else {
+                console.log('[API-CLIENT] Refresh failed, logging out');
+                // Logout and redirect
+                await fetch('/api/auth/logout', {
+                  method: 'POST',
+                  credentials: 'include',
+                });
+                window.location.href = '/login';
+                return false;
+              }
+            } catch (error) {
+              console.error('[API-CLIENT] Refresh error:', error);
+              return false;
+            } finally {
+              this.refreshPromise = null;
+            }
+          })();
+          
+          const success = await this.refreshPromise;
+          if (success) {
+            console.log('[API-CLIENT] Retrying original request');
+            return this.request<T>(endpoint, options, true);
+          }
+        }
+      }
 
       if (!response.ok) {
         const error = await this.handleError(response);

@@ -21,7 +21,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { SESSION_COOKIE_CONFIG } from '@/lib/auth/session';
+import { SESSION_COOKIE_CONFIG, REFRESH_COOKIE_CONFIG } from '@/lib/auth/session';
 
 /**
  * POST handler for logout
@@ -48,14 +48,28 @@ export async function POST() {
     message: 'Logged out successfully',
   });
 
-  // Clear session cookie by setting it with an expired date
+  // Clear access token cookie (session_token)
   response.cookies.set(SESSION_COOKIE_CONFIG.name, '', {
     httpOnly: SESSION_COOKIE_CONFIG.httpOnly,
     secure: SESSION_COOKIE_CONFIG.secure,
     sameSite: SESSION_COOKIE_CONFIG.sameSite,
     path: SESSION_COOKIE_CONFIG.path,
-    expires: new Date(0), // Expire immediately
+    maxAge: 0,
+    expires: new Date(0),
   });
+
+
+  // Clear refresh token cookie (refresh_token)
+  response.cookies.set(REFRESH_COOKIE_CONFIG.name, '', {
+    httpOnly: REFRESH_COOKIE_CONFIG.httpOnly,
+    secure: REFRESH_COOKIE_CONFIG.secure,
+    sameSite: REFRESH_COOKIE_CONFIG.sameSite,
+    path: REFRESH_COOKIE_CONFIG.path,
+    maxAge: 0,
+    expires: new Date(0),
+  });
+
+  console.log('[LOGOUT-ROUTE] Both authentication cookies cleared');
 
   return response;
 }

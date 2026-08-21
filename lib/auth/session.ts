@@ -36,6 +36,7 @@ import type { Session, UserInfo } from '@/types/auth';
  * Session cookie configuration constants
  */
 export const SESSION_COOKIE_NAME = 'session_token';
+export const REFRESH_COOKIE_NAME = 'refresh_token';
 
 /**
  * Session cookie configuration object
@@ -47,6 +48,20 @@ export const SESSION_COOKIE_CONFIG = {
   secure: process.env.NODE_ENV === 'production',
   sameSite: 'lax' as const,
   path: '/',
+  maxAge: 15 * 60, // 15 minutes
+} as const;
+
+/**
+ * Refresh token cookie configuration object
+ * Used for automatic token refresh without requiring re-login
+ */
+export const REFRESH_COOKIE_CONFIG = {
+  name: REFRESH_COOKIE_NAME,
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax' as const,
+  path: '/',
+  maxAge: 7 * 24 * 60 * 60, // 7 days
 } as const;
 
 /**

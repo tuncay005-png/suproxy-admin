@@ -166,7 +166,8 @@ export function PlanEditForm({ plan, onSuccess }: PlanEditFormProps) {
         />
 
         {/* Price and Currency fields (side by side) */}
-        <div className="grid gap-4 sm:grid-cols-2">
+        {/* Tablet optimization: 2-column layout at md: breakpoint (768px) */}
+        <div className="grid gap-4 md:grid-cols-2">
           {/* Price field */}
           <FormField
             control={form.control}
@@ -220,7 +221,8 @@ export function PlanEditForm({ plan, onSuccess }: PlanEditFormProps) {
         </div>
 
         {/* Duration and Data Limit fields (side by side) */}
-        <div className="grid gap-4 sm:grid-cols-2">
+        {/* Tablet optimization: 2-column layout at md: breakpoint (768px) */}
+        <div className="grid gap-4 md:grid-cols-2">
           {/* Duration field */}
           <FormField
             control={form.control}

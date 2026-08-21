@@ -29,7 +29,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { SESSION_COOKIE_CONFIG } from '@/lib/auth/session';
+import { SESSION_COOKIE_CONFIG, REFRESH_COOKIE_CONFIG } from '@/lib/auth/session';
 import type { LoginCredentials, BackendLoginResponse } from '@/types/auth';
 
 /**
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
     console.log('[LOGIN-ROUTE] User:', backendData.data.user.email);
 
     // Extract access token and user data
-    const { access_token, user } = backendData.data;
+    const { access_token, refresh_token, user } = backendData.data;
 
     // Create response with user data
     const response = NextResponse.json({
@@ -118,7 +118,14 @@ export async function POST(request: NextRequest) {
       // Backend token expiration is managed by the backend
     });
 
-    console.log('[LOGIN-ROUTE] Session cookie set successfully');
+    // Set refresh token cookie (refresh_token) - 7 days
+    response.cookies.set(
+      REFRESH_COOKIE_CONFIG.name,
+      refresh_token,
+      REFRESH_COOKIE_CONFIG
+    );
+
+    console.log('[LOGIN-ROUTE] Both authentication cookies set successfully');
 
     return response;
   } catch (error) {

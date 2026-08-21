@@ -1,21 +1,25 @@
-/**
+﻿/**
  * Session entity TypeScript type definitions
- * These types define user session data structures
+ * These types define user session data structures matching backend Go DTO
  */
 
 /**
- * User session entity representing an authenticated user's active session
+ * User session entity representing an authenticated user active session
+ * Maps to backend SessionInfo DTO
  */
 export interface UserSession {
   id: string;
-  user_id: string;
-  username: string;
-  email: string;
+  user_id?: string;
+  username?: string;
+  email?: string;
+  device_name: string;
+  platform: string;
   ip_address: string;
-  user_agent: string;
+  user_agent?: string; // Optional - fallback for display
+  last_used_at?: string | null;
+  last_activity_at?: string;
   created_at: string;
-  last_activity_at: string;
-  expires_at: string;
+  expires_at?: string;
 }
 
 /**
