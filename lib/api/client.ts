@@ -231,6 +231,79 @@ class ApiClient {
     }
   }
 
+  /**
+   * Attempt token refresh with single-flight pattern
+   * Ensures only one refresh request is in-flight at a time
+   * @returns Promise<boolean> - true if refresh succeeded
+   */
+  private async attemptTokenRefresh(): Promise<boolean> {
+    // Single-flight: reuse existing refresh promise
+    if (this.refreshPromise) {
+      console.log('[API-CLIENT] Refresh already in progress, waiting...');
+      return await this.refreshPromise;
+    }
+
+    // Start new refresh
+    console.log('[API-CLIENT] Starting token refresh...');
+    this.refreshPromise = this.executeTokenRefresh();
+    
+    try {
+      const result = await this.refreshPromise;
+      return result;
+    } finally {
+      // Always cleanup promise to prevent stuck state
+      this.refreshPromise = null;
+    }
+  }
+
+  /**
+   * Execute the actual token refresh request
+   * @returns Promise<boolean> - true if refresh succeeded
+   */
+  private async executeTokenRefresh(): Promise<boolean> {
+    try {
+      const refreshResponse = await this.fetchWithTimeout('/api/auth/refresh', {
+        method: 'POST',
+        credentials: 'include',
+      }, 5000);
+
+      if (refreshResponse.ok) {
+        console.log('[API-CLIENT] Token refresh successful');
+        return true;
+      } else {
+        console.warn('[API-CLIENT] Token refresh failed with status:', refreshResponse.status);
+        return false;
+      }
+    } catch (error) {
+      console.error('[API-CLIENT] Token refresh error:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Handle graceful logout when refresh fails
+   * Clears cookies and redirects to login
+   */
+  private async handleGracefulLogout(): Promise<void> {
+    console.log('[API-CLIENT] Performing graceful logout...');
+    
+    try {
+      // Clear server-side session
+      await this.fetchWithTimeout('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      }, 5000);
+    } catch (error) {
+      console.warn('[API-CLIENT] Logout request failed, proceeding with redirect:', error);
+    }
+
+    // Client-side redirect only
+    if (typeof window !== 'undefined') {
+      console.log('[API-CLIENT] Redirecting to login...');
+      window.location.href = '/login?reason=session_expired';
+    }
+  }
+
   
   private async request<T>(
     endpoint: string,
@@ -287,51 +360,45 @@ class ApiClient {
 
       // Client-side 401 handling with automatic refresh (max 1 retry)
       if (!response.ok && response.status === 401 && typeof window !== 'undefined' && !endpoint.includes('/api/auth/refresh') && !_isRetryAfterRefresh) {
-        console.log('[API-CLIENT] 401 detected, attempting refresh...');
-        
-        // Single-flight mutex: wait if refresh already in progress
-        if (this.refreshPromise) {
-          console.log('[API-CLIENT] Refresh already in progress, waiting...');
-          const success = await this.refreshPromise;
-          if (success) {
-            console.log('[API-CLIENT] Retrying after completed refresh');
-            return this.request<T>(endpoint, options, true);
-          }
-        } else {
-          // Start new refresh
-          this.refreshPromise = (async () => {
-            try {
-              console.log('[API-CLIENT] Calling refresh endpoint...');
-              const refreshResponse = await this.fetchWithTimeout('/api/auth/refresh', {
-                method: 'POST',
-                credentials: 'include',
-              }, 5000); // 5s timeout for refresh
-              
-              if (refreshResponse.ok) {
-                console.log('[API-CLIENT] Refresh successful');
-                return true;
-              } else {
-                console.log('[API-CLIENT] Refresh failed, logging out');
-                // Logout and redirect
-                await this.fetchWithTimeout('/api/auth/logout', {
-                  method: 'POST',
-                  credentials: 'include',
-                }, 5000); // 5s timeout for logout
-                window.location.href = '/login';
-                return false;
-              }
-            } catch (error) {
-              console.error('[API-CLIENT] Refresh error:', error);
-              return false;
-            } finally {
-              this.refreshPromise = null;
-            }
-          })();
+        // Check if this is a TOKEN_EXPIRED error (not other 401s like permissions)
+        let shouldRetryWithRefresh = false;
+        try {
+          const errorData = await response.clone().json();
+          // Support multiple backend error formats
+          const errorCode = errorData?.error?.code || errorData?.code || '';
+          const errorMessage = errorData?.error?.message || errorData?.message || '';
           
-          const success = await this.refreshPromise;
-          if (success) {
-            console.log('[API-CLIENT] Retrying original request');
-            return this.request<T>(endpoint, options, true);
+          if (errorCode === 'TOKEN_EXPIRED' || errorMessage.includes('token has expired') || errorMessage.includes('access token has expired')) {
+            shouldRetryWithRefresh = true;
+            console.log('[API-CLIENT] TOKEN_EXPIRED detected, attempting refresh...');
+          } else {
+            console.log('[API-CLIENT] Non-token 401 error, not refreshing. Code:', errorCode);
+          }
+        } catch {
+          // If we can't parse error, don't assume it's token expiry
+          console.log('[API-CLIENT] Could not parse 401 error, skipping refresh');
+        }
+
+        if (shouldRetryWithRefresh) {
+          const refreshSuccess = await this.attemptTokenRefresh();
+          
+          if (refreshSuccess) {
+            console.log('[API-CLIENT] Retrying original request after successful refresh');
+            // Clone options to safely retry POST/PUT/PATCH with body
+            const retryOptions = options ? { ...options } : undefined;
+            if (retryOptions && options?.body) {
+              // Body can be reused if it's a string (JSON.stringify result)
+              retryOptions.body = options.body;
+            }
+            return this.request<T>(endpoint, retryOptions, true);
+          } else {
+            console.log('[API-CLIENT] Refresh failed, triggering logout');
+            await this.handleGracefulLogout();
+            throw new ApiError(
+              'Session expired. Please log in again.',
+              401,
+              'SESSION_EXPIRED'
+            );
           }
         }
       }

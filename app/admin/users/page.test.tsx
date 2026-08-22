@@ -80,7 +80,7 @@ describe('UsersPage', () => {
 
     // Act
     const { default: UsersPage } = await import('./page');
-    const result = await UsersPage({ searchParams: {} });
+    const result = await UsersPage({ searchParams: Promise.resolve({}) });
 
     // Assert
     expect(usersApi.list).toHaveBeenCalledOnce();
@@ -101,7 +101,7 @@ describe('UsersPage', () => {
 
     // Act
     const { default: UsersPage } = await import('./page');
-    const result = await UsersPage({ searchParams: {} });
+    const result = await UsersPage({ searchParams: Promise.resolve({}) });
 
     // Assert
     expect(usersApi.list).toHaveBeenCalledOnce();
@@ -115,6 +115,6 @@ describe('UsersPage', () => {
 
     // Act & Assert
     const { default: UsersPage } = await import('./page');
-    await expect(UsersPage({ searchParams: {} })).rejects.toThrow('API Error');
+    await expect(UsersPage({ searchParams: Promise.resolve({}) })).rejects.toThrow('API Error');
   });
 });

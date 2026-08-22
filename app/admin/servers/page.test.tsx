@@ -64,7 +64,7 @@ describe('ServersPage', () => {
       },
     } as any);
 
-    render(await ServersPage({ searchParams: {} }));
+    render(await ServersPage({ searchParams: Promise.resolve({}) }));
 
     expect(screen.getByText('Servers')).toBeInTheDocument();
     expect(screen.getByText('View and monitor server infrastructure')).toBeInTheDocument();
@@ -104,7 +104,7 @@ describe('ServersPage', () => {
       },
     } as any);
 
-    render(await ServersPage({ searchParams: {} }));
+    render(await ServersPage({ searchParams: Promise.resolve({}) }));
 
     // Verify servers are passed to table
     expect(screen.getByTestId('servers-table')).toBeInTheDocument();
@@ -123,7 +123,7 @@ describe('ServersPage', () => {
       },
     } as any);
 
-    await ServersPage({ searchParams: {} });
+    await ServersPage({ searchParams: Promise.resolve({}) });
 
     expect(serversApi.list).toHaveBeenCalledTimes(1);
   });
@@ -137,7 +137,7 @@ describe('ServersPage', () => {
       },
     } as any);
 
-    render(await ServersPage({ searchParams: {} }));
+    render(await ServersPage({ searchParams: Promise.resolve({}) }));
 
     expect(screen.getByTestId('servers-table')).toBeInTheDocument();
   });
@@ -187,7 +187,7 @@ describe('ServersPage', () => {
       },
     } as any);
 
-    render(await ServersPage({ searchParams: {} }));
+    render(await ServersPage({ searchParams: Promise.resolve({}) }));
 
     expect(screen.getByText('Online Server')).toBeInTheDocument();
     expect(screen.getByText('Offline Server')).toBeInTheDocument();

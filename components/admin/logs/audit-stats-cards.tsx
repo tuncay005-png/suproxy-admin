@@ -115,8 +115,8 @@ export function AuditStatsCards() {
     return null;
   }
 
-  // Get top 3 action types by count
-  const topActions = Object.entries(stats.actions_by_type)
+  // Get top 3 action types by count - defensive against missing data
+  const topActions = Object.entries(stats.actions_by_type || {})
     .sort(([, a], [, b]) => b - a)
     .slice(0, 3);
 

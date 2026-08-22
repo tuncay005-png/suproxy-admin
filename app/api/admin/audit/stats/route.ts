@@ -64,9 +64,28 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Parse and return backend response
+    // Parse backend response
     const data = await backendResponse.json();
-    return NextResponse.json(data);
+    
+    // Normalize backend response to match frontend contract
+    // Backend sends: total_logs, logs_by_action, logs_by_entity_type
+    // Frontend expects: total_actions, actions_by_type, recent_activity_count
+    const normalizedResponse = {
+      success: data.success ?? true,
+      data: {
+        // Required fields with defensive fallbacks
+        total_actions: data.data?.total_logs ?? 0,
+        actions_by_type: data.data?.logs_by_action ?? {},
+        recent_activity_count: data.data?.total_logs ?? 0,
+        
+        // Optional backend fields (preserve if present)
+        logs_by_entity_type: data.data?.logs_by_entity_type,
+        unique_users: data.data?.unique_users,
+        unique_ip_addresses: data.data?.unique_ip_addresses,
+      }
+    };
+    
+    return NextResponse.json(normalizedResponse);
   } catch (error) {
     console.error('[AUDIT-STATS-ROUTE] Error:', error);
     

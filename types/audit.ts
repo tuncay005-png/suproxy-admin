@@ -50,4 +50,8 @@ export interface AuditStats {
   total_actions: number;
   actions_by_type: Record<string, number>;
   recent_activity_count: number;
+  // Optional backend fields
+  logs_by_entity_type?: Record<string, number>;
+  unique_users?: number;
+  unique_ip_addresses?: number;
 }

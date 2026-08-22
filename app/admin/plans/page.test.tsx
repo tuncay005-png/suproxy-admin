@@ -86,7 +86,7 @@ describe('PlansPage', () => {
       },
     });
 
-    const { container } = render(await PlansPage({ searchParams: {} }));
+    const { container } = render(await PlansPage({ searchParams: Promise.resolve({}) }));
 
     // Check page header
     expect(screen.getByTestId('page-header')).toBeDefined();
@@ -111,7 +111,7 @@ describe('PlansPage', () => {
       },
     });
 
-    render(await PlansPage({ searchParams: {} }));
+    render(await PlansPage({ searchParams: Promise.resolve({}) }));
 
     // Check page header
     expect(screen.getByText('Subscription Plans')).toBeDefined();
@@ -130,7 +130,7 @@ describe('PlansPage', () => {
       },
     });
 
-    render(await PlansPage({ searchParams: {} }));
+    render(await PlansPage({ searchParams: Promise.resolve({}) }));
 
     expect(plansApi.list).toHaveBeenCalledOnce();
   });

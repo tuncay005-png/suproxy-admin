@@ -88,7 +88,7 @@ describe('AuditLogsPage', () => {
   });
 
   it('should render audit logs page with heading', async () => {
-    const page = await AuditLogsPage({ searchParams: {} });
+    const page = await AuditLogsPage({ searchParams: Promise.resolve({}) });
     render(page);
 
     expect(screen.getAllByText('Audit Logs')[0]).toBeInTheDocument();
@@ -96,7 +96,7 @@ describe('AuditLogsPage', () => {
   });
 
   it('should fetch logs with default filters', async () => {
-    await AuditLogsPage({ searchParams: {} });
+    await AuditLogsPage({ searchParams: Promise.resolve({}) });
 
     expect(auditApi.getLogs).toHaveBeenCalledWith({
       page: 1,
@@ -110,14 +110,14 @@ describe('AuditLogsPage', () => {
 
   it('should parse search params and fetch logs with filters', async () => {
     await AuditLogsPage({
-      searchParams: {
+      searchParams: Promise.resolve({
         page: '2',
         limit: '50',
         action: 'user.create',
         entity_type: 'user',
         start_date: '2024-01-01T00:00:00Z',
         end_date: '2024-01-31T23:59:59Z',
-      },
+      }),
     });
 
     expect(auditApi.getLogs).toHaveBeenCalledWith({
@@ -131,7 +131,7 @@ describe('AuditLogsPage', () => {
   });
 
   it('should render audit logs table with data', async () => {
-    const page = await AuditLogsPage({ searchParams: {} });
+    const page = await AuditLogsPage({ searchParams: Promise.resolve({}) });
     render(page);
 
     // Table should be rendered with logs (we have 2 logs with same actor)
@@ -141,7 +141,7 @@ describe('AuditLogsPage', () => {
 
   it('should pass pagination data to table component', async () => {
     const page = await AuditLogsPage({
-      searchParams: { page: '2', limit: '10' },
+      searchParams: Promise.resolve({ page: '2', limit: '10' }),
     });
     
     vi.mocked(auditApi.getLogs).mockResolvedValue({
@@ -162,10 +162,10 @@ describe('AuditLogsPage', () => {
 
   it('should render filters component with current filter values', async () => {
     const page = await AuditLogsPage({
-      searchParams: {
+      searchParams: Promise.resolve({
         action: 'user.create',
         entity_type: 'user',
-      },
+      }),
     });
     render(page);
 
@@ -174,7 +174,7 @@ describe('AuditLogsPage', () => {
   });
 
   it('should render audit stats cards component', async () => {
-    const page = await AuditLogsPage({ searchParams: {} });
+    const page = await AuditLogsPage({ searchParams: Promise.resolve({}) });
     render(page);
 
     // Stats cards component should be rendered
