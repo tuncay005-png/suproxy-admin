@@ -53,7 +53,10 @@ function formatBuildDate(buildDate: string): string {
 /**
  * Truncate git commit hash to short format (first 7 characters)
  */
-function formatGitCommit(commit: string): string {
+function formatGitCommit(commit: string | undefined | null): string {
+  if (!commit) {
+    return 'N/A';
+  }
   if (commit.length > 7) {
     return commit.substring(0, 7);
   }

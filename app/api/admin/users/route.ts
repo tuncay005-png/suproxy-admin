@@ -1,7 +1,7 @@
-/**
+﻿/**
  * Admin Users API Route
  * 
- * GET /api/admin/users
+ * GET /api/admin/users?offset=0&limit=20
  * POST /api/admin/users
  * 
  * Proxies requests to the backend Go API for user management.
@@ -37,9 +37,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Forward request to backend with authentication
-    // Backend endpoint is /api/v1/admin/users
-    const backendEndpoint = `${backendUrl}/api/v1/admin/users`;
+    // Extract query parameters (offset, limit) from request
+    const { searchParams } = new URL(request.url);
+    const offset = searchParams.get('offset') || '0';
+    const limit = searchParams.get('limit') || '20';
+
+    // Forward request to backend with authentication and pagination
+    // Backend endpoint is /api/v1/admin/users?offset=N&limit=M
+    const backendEndpoint = `${backendUrl}/api/v1/admin/users?offset=${offset}&limit=${limit}`;
     
     const backendResponse = await fetch(backendEndpoint, {
       method: 'GET',

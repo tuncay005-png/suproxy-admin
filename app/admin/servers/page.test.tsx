@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Servers Page Tests
  * 
  * Tests for the servers list page component.
@@ -64,7 +64,7 @@ describe('ServersPage', () => {
       },
     } as any);
 
-    render(await ServersPage());
+    render(await ServersPage({ searchParams: {} }));
 
     expect(screen.getByText('Servers')).toBeInTheDocument();
     expect(screen.getByText('View and monitor server infrastructure')).toBeInTheDocument();
@@ -104,7 +104,7 @@ describe('ServersPage', () => {
       },
     } as any);
 
-    render(await ServersPage());
+    render(await ServersPage({ searchParams: {} }));
 
     // Verify servers are passed to table
     expect(screen.getByTestId('servers-table')).toBeInTheDocument();
@@ -123,7 +123,7 @@ describe('ServersPage', () => {
       },
     } as any);
 
-    await ServersPage();
+    await ServersPage({ searchParams: {} });
 
     expect(serversApi.list).toHaveBeenCalledTimes(1);
   });
@@ -137,7 +137,7 @@ describe('ServersPage', () => {
       },
     } as any);
 
-    render(await ServersPage());
+    render(await ServersPage({ searchParams: {} }));
 
     expect(screen.getByTestId('servers-table')).toBeInTheDocument();
   });
@@ -187,7 +187,7 @@ describe('ServersPage', () => {
       },
     } as any);
 
-    render(await ServersPage());
+    render(await ServersPage({ searchParams: {} }));
 
     expect(screen.getByText('Online Server')).toBeInTheDocument();
     expect(screen.getByText('Offline Server')).toBeInTheDocument();

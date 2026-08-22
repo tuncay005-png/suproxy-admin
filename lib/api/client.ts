@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Centralized API Client
  * Provides a consistent interface for all backend HTTP communication
  * 
@@ -29,7 +29,7 @@
  * const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
  * 
  * try {
- *   const response = await fetch(url, {
+ *   const response = await this.fetchWithTimeout(url, {
  *     signal: controller.signal,
  *     // ... other options
  *   });
@@ -193,6 +193,45 @@ class ApiClient {
    * @returns Promise resolving to the typed response data
    * @throws ApiError when the request fails
    */
+  /**
+   * Execute fetch with timeout
+   * @param url Request URL
+   * @param options Fetch options
+   * @param timeout Timeout in milliseconds (default: 10000)
+   * @returns Promise resolving to Response
+   * @throws ApiError with code API_TIMEOUT on timeout
+   */
+  private async fetchWithTimeout(
+    url: string,
+    options: RequestInit,
+    timeout: number = 10000
+  ): Promise<Response> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new ApiError(
+          'Request timeout. The server took too long to respond.',
+          408,
+          'API_TIMEOUT'
+        );
+      }
+      
+      throw error;
+    }
+  }
+
+  
   private async request<T>(
     endpoint: string,
     options?: RequestInit,
@@ -239,7 +278,7 @@ class ApiClient {
         }
       }
 
-      const response = await fetch(url, {
+      const response = await this.fetchWithTimeout(url, {
         ...options,
         credentials: isServerSide ? 'include' : 'include', // Include cookies for session management
         headers,
@@ -263,10 +302,10 @@ class ApiClient {
           this.refreshPromise = (async () => {
             try {
               console.log('[API-CLIENT] Calling refresh endpoint...');
-              const refreshResponse = await fetch('/api/auth/refresh', {
+              const refreshResponse = await this.fetchWithTimeout('/api/auth/refresh', {
                 method: 'POST',
                 credentials: 'include',
-              });
+              }, 5000); // 5s timeout for refresh
               
               if (refreshResponse.ok) {
                 console.log('[API-CLIENT] Refresh successful');
@@ -274,10 +313,10 @@ class ApiClient {
               } else {
                 console.log('[API-CLIENT] Refresh failed, logging out');
                 // Logout and redirect
-                await fetch('/api/auth/logout', {
+                await this.fetchWithTimeout('/api/auth/logout', {
                   method: 'POST',
                   credentials: 'include',
-                });
+                }, 5000); // 5s timeout for logout
                 window.location.href = '/login';
                 return false;
               }
@@ -377,9 +416,9 @@ class ApiClient {
     const sanitizedDetails = this.sanitizeErrorDetails(error.details);
 
     // Log structured error with clear formatting for unexpected errors
-    console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.error('â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”');
     console.error('API Error Details:');
-    console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.error('â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”');
     console.error('Endpoint:', context.url);
     console.error('Method:', context.method);
     console.error('Status:', error.status || 'N/A');
@@ -391,7 +430,7 @@ class ApiClient {
     }
     
     console.error('Timestamp:', new Date().toISOString());
-    console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.error('â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”');
   }
 
   /**

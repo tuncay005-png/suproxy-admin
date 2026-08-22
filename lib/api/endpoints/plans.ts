@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Plan Management API Endpoint Module
  * Provides methods for subscription plan management operations
  * 
@@ -13,14 +13,22 @@ import type { ApiResponse } from '@/types/api';
 import type { Plan, CreatePlanInput, PlansListResponse } from '@/types/plan';
 
 /**
+ * Pagination parameters for list queries
+ */
+export interface PaginationParams {
+  page?: number;
+  limit?: number;
+}
+
+/**
  * Plan management API endpoints
  * 
  * @example
  * import { plansApi } from '@/lib/api/endpoints/plans';
  * 
- * // List all plans
- * const response = await plansApi.list();
- * console.log(`Found ${response.data.plans.length} plans`);
+ * // List plans with pagination
+ * const response = await plansApi.list({ page: 1, limit: 20 });
+ * console.log(`Found ${response.data.plans.length} plans out of ${response.data.total}`);
  * 
  * // Create a new plan
  * const newPlan = await plansApi.create({
@@ -35,48 +43,41 @@ import type { Plan, CreatePlanInput, PlansListResponse } from '@/types/plan';
  */
 export const plansApi = {
   /**
-   * List all subscription plans
+   * List subscription plans with pagination
    * 
+   * @param params Pagination parameters (page, limit)
    * @returns Promise resolving to list of plans with pricing and limits
    * @throws ApiError when the request fails
    * 
    * @example
    * try {
-   *   const response = await plansApi.list();
+   *   const response = await plansApi.list({ page: 1, limit: 20 });
    *   const plans = response.data.plans;
-   *   console.log(`Found ${plans.length} plans`);
+   *   console.log(`Found ${plans.length} plans out of ${response.data.total} total`);
    *   plans.forEach(plan => {
    *     console.log(`${plan.name}: ${plan.price} ${plan.currency}`);
    *     console.log(`  Active subscriptions: ${plan.active_subscriptions}`);
    *   });
    * } catch (error) {
-   *   if (error instanceof ApiError) {
-   *     console.error('Failed to fetch plans:', error.message);
-   *   }
+   *   console.error('Failed to fetch plans:', error);
    * }
    */
-  list: (): Promise<ApiResponse<PlansListResponse>> =>
-    apiClient.get<ApiResponse<PlansListResponse>>('/api/plans'),
+  list: (params?: PaginationParams): Promise<ApiResponse<PlansListResponse>> => {
+    const page = params?.page ?? 1;
+    const limit = Math.min(params?.limit ?? 20, 100); // Max 100
+    const offset = (page - 1) * limit;
+    
+    return apiClient.get<ApiResponse<PlansListResponse>>(
+      `/api/plans?offset=${offset}&limit=${limit}`
+    );
+  },
 
   /**
-   * Get details for a specific plan
+   * Get plan details by ID
    * 
    * @param id Plan UUID
-   * @returns Promise resolving to plan details
+   * @returns Promise resolving to the plan object
    * @throws ApiError when plan not found or request fails
-   * 
-   * @example
-   * try {
-   *   const response = await plansApi.getById('123e4567-e89b-12d3-a456-426614174000');
-   *   console.log('Plan:', response.data.name);
-   *   console.log('Price:', response.data.price, response.data.currency);
-   *   console.log('Duration:', response.data.duration_days, 'days');
-   *   console.log('Data limit:', response.data.data_limit_gb, 'GB');
-   * } catch (error) {
-   *   if (error instanceof ApiError && error.status === 404) {
-   *     console.error('Plan not found');
-   *   }
-   * }
    */
   getById: (id: string): Promise<ApiResponse<Plan>> =>
     apiClient.get<ApiResponse<Plan>>(`/api/plans/${id}`),
@@ -84,27 +85,9 @@ export const plansApi = {
   /**
    * Create a new subscription plan
    * 
-   * @param data Plan creation data (name, description, price, currency, duration, limits, active)
-   * @returns Promise resolving to created plan
-   * @throws ApiError when creation fails (e.g., validation errors, duplicate name)
-   * 
-   * @example
-   * try {
-   *   const response = await plansApi.create({
-   *     name: 'Premium',
-   *     description: 'Premium subscription',
-   *     price: 29.99,
-   *     currency: 'USD',
-   *     duration_days: 30,
-   *     data_limit_gb: 1000,
-   *     active: true
-   *   });
-   *   console.log('Plan created:', response.data.id);
-   * } catch (error) {
-   *   if (error instanceof ApiError && error.isValidationError) {
-   *     console.error('Validation error:', error.details);
-   *   }
-   * }
+   * @param data Plan creation data
+   * @returns Promise resolving to the created plan object
+   * @throws ApiError when validation fails or request fails
    */
   create: (data: CreatePlanInput): Promise<ApiResponse<Plan>> =>
     apiClient.post<ApiResponse<Plan>>('/api/plans', data),
@@ -113,48 +96,20 @@ export const plansApi = {
    * Update an existing plan
    * 
    * @param id Plan UUID
-   * @param data Partial plan data to update
-   * @returns Promise resolving to updated plan
-   * @throws ApiError when update fails (e.g., validation errors)
-   * 
-   * @example
-   * try {
-   *   const response = await plansApi.update('123e4567-e89b-12d3-a456-426614174000', {
-   *     price: 24.99,
-   *     description: 'Updated premium subscription'
-   *   });
-   *   console.log('Plan updated:', response.data);
-   * } catch (error) {
-   *   if (error instanceof ApiError && error.isValidationError) {
-   *     console.error('Validation error:', error.details);
-   *   }
-   * }
+   * @param data Updated plan data
+   * @returns Promise resolving to the updated plan object
+   * @throws ApiError when plan not found or request fails
    */
   update: (id: string, data: Partial<CreatePlanInput>): Promise<ApiResponse<Plan>> =>
     apiClient.put<ApiResponse<Plan>>(`/api/plans/${id}`, data),
 
   /**
-   * Delete a subscription plan
-   * Note: Backend may prevent deletion if plan has active subscriptions
+   * Delete a plan
    * 
-   * @param id Plan UUID
-   * @returns Promise resolving to success message
-   * @throws ApiError when deletion fails (e.g., plan has active subscriptions)
-   * 
-   * @example
-   * try {
-   *   await plansApi.delete('123e4567-e89b-12d3-a456-426614174000');
-   *   console.log('Plan deleted successfully');
-   * } catch (error) {
-   *   if (error instanceof ApiError) {
-   *     if (error.status === 400) {
-   *       console.error('Cannot delete plan with active subscriptions');
-   *     } else {
-   *       console.error('Failed to delete plan:', error.message);
-   *     }
-   *   }
-   * }
+   * @param id Plan UUID to delete
+   * @returns Promise resolving when deletion is complete
+   * @throws ApiError when plan not found or request fails
    */
-  delete: (id: string): Promise<ApiResponse<{ message: string }>> =>
-    apiClient.delete<ApiResponse<{ message: string }>>(`/api/plans/${id}`),
+  delete: (id: string): Promise<{ success: boolean; message: string }> =>
+    apiClient.delete<{ success: boolean; message: string }>(`/api/plans/${id}`),
 };

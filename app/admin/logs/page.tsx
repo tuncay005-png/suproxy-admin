@@ -34,14 +34,14 @@ import { AuditStatsCards } from '@/components/admin/logs/audit-stats-cards';
 import type { AuditLogsFilter } from '@/types/audit';
 
 export interface AuditLogsPageProps {
-  searchParams: {
+  searchParams: Promise<{
     page?: string;
     limit?: string;
     action?: string;
     entity_type?: string;
     start_date?: string;
     end_date?: string;
-  };
+  }>;
 }
 
 /**
@@ -51,14 +51,17 @@ export interface AuditLogsPageProps {
  * and renders the audit log management interface.
  */
 export default async function AuditLogsPage({ searchParams }: AuditLogsPageProps) {
+  // Await searchParams
+  const params = await searchParams;
+  
   // Parse search params into filter object
   const filters: AuditLogsFilter = {
-    page: searchParams.page ? parseInt(searchParams.page, 10) : 1,
-    limit: searchParams.limit ? parseInt(searchParams.limit, 10) : 25,
-    action: searchParams.action || undefined,
-    entity_type: searchParams.entity_type || undefined,
-    start_date: searchParams.start_date || undefined,
-    end_date: searchParams.end_date || undefined,
+    page: params.page ? parseInt(params.page, 10) : 1,
+    limit: params.limit ? parseInt(params.limit, 10) : 25,
+    action: params.action || undefined,
+    entity_type: params.entity_type || undefined,
+    start_date: params.start_date || undefined,
+    end_date: params.end_date || undefined,
   };
 
   // Fetch audit logs with filters

@@ -1,44 +1,45 @@
-/**
- * Servers List Page
- * 
- * Server Component that fetches and displays the list of servers.
- * 
- * ## Features
- * 
- * - Server-side data fetching for optimal performance
- * - Automatic loading and error states
- * - Responsive server table display
- * - Server name, country, city, IP address, status, and node count display
- * 
- * ## Data Flow
- * 
- * 1. Server Component fetches servers data via serversApi.list()
- * 2. Data is passed to client components for rendering
- * 3. Error boundary handles fetch failures
- * 4. Loading state shows skeleton UI during data fetch
- * 
- * Validates: Requirements 7.1, 7.2, 11.1
- * 
- * @module app/admin/servers/page
+﻿/**
+ * Servers List Page with Server-Side Pagination
  */
-
-// Force dynamic rendering - requires authentication and real-time backend data
 export const dynamic = 'force-dynamic';
 
 import { serversApi } from '@/lib/api/endpoints/servers';
+import type { Server } from '@/types/server';
 import { PageHeader } from '@/components/admin/page-header';
 import { ServersTable } from '@/components/admin/servers/servers-table';
+import { ErrorState } from '@/components/ui/error-state';
+import { Pagination } from '@/components/ui/pagination';
 
-/**
- * Servers list page - Server Component
- * 
- * Fetches servers data server-side and renders the server management interface.
- */
-export default async function ServersPage() {
-  // Fetch servers data server-side
-  // Backend returns: {success: true, data: {servers: [...], total: number}}
-  const response = await serversApi.list();
-  const servers = response.data.servers;
+interface SearchParams {
+  page?: string;
+  limit?: string;
+}
+
+export default async function ServersPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const params = await searchParams;
+  const parsedPage = parseInt(params.page || '1', 10);
+  const page = Math.max(1, isNaN(parsedPage) ? 1 : parsedPage);
+  const parsedLimit = parseInt(params.limit || '20', 10);
+  const limit = Math.min(Math.max(20, isNaN(parsedLimit) ? 20 : parsedLimit), 100);
+
+  let servers: Server[] = [];
+  let total = 0;
+  let error: Error | null = null;
+
+  try {
+    const response = await serversApi.list({ page, limit });
+    servers = response.data.servers;
+    total = response.data.total;
+  } catch (err) {
+    console.error('[SERVERS-PAGE] Failed to fetch servers:', err);
+    error = err as Error;
+  }
+
+  const totalPages = Math.ceil(total / limit);
 
   return (
     <div className="space-y-4 md:space-y-6">
@@ -47,8 +48,31 @@ export default async function ServersPage() {
         description="View and monitor server infrastructure"
       />
 
-      {/* Servers table */}
-      <ServersTable servers={servers} />
+      {error ? (
+        <ErrorState
+          title="Unable to load servers"
+          description="Backend service is temporarily unavailable. Please try again later."
+          onRetry={() => {
+            if (typeof window !== 'undefined') {
+              window.location.reload();
+            }
+          }}
+        />
+      ) : (
+        <>
+          <ServersTable servers={servers} />
+          
+          {total > 0 && (
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalItems={total}
+              itemsPerPage={limit}
+              baseUrl="/admin/servers"
+            />
+          )}
+        </>
+      )}
     </div>
   );
 }

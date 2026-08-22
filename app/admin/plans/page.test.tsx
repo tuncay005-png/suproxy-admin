@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Tests for Plans List Page
  * 
  * Validates that the plans list page renders correctly with data fetching.
@@ -86,7 +86,7 @@ describe('PlansPage', () => {
       },
     });
 
-    const { container } = render(await PlansPage());
+    const { container } = render(await PlansPage({ searchParams: {} }));
 
     // Check page header
     expect(screen.getByTestId('page-header')).toBeDefined();
@@ -111,7 +111,7 @@ describe('PlansPage', () => {
       },
     });
 
-    render(await PlansPage());
+    render(await PlansPage({ searchParams: {} }));
 
     // Check page header
     expect(screen.getByText('Subscription Plans')).toBeDefined();
@@ -130,7 +130,7 @@ describe('PlansPage', () => {
       },
     });
 
-    render(await PlansPage());
+    render(await PlansPage({ searchParams: {} }));
 
     expect(plansApi.list).toHaveBeenCalledOnce();
   });

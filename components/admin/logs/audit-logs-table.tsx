@@ -96,6 +96,9 @@ export function AuditLogsTable({ logs, total, currentPage, pageSize, totalPages 
   // State for detail dialog
   const [selectedLog, setSelectedLog] = React.useState<AuditLog | null>(null);
 
+  // Safety check - handle undefined or null logs
+  const safeLogs = Array.isArray(logs) ? logs : [];
+
   // Navigate to a different page
   const navigateToPage = React.useCallback((page: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -112,7 +115,7 @@ export function AuditLogsTable({ logs, total, currentPage, pageSize, totalPages 
   }, [router, searchParams]);
 
   // Show empty state if no logs exist
-  if (logs.length === 0) {
+  if (safeLogs.length === 0) {
     return (
       <Card>
         <CardContent className="pt-6">
@@ -139,7 +142,7 @@ export function AuditLogsTable({ logs, total, currentPage, pageSize, totalPages 
               Showing {startItem}-{endItem} of {total} log entries
             </CardDescription>
           </div>
-          <ExportLogsButton logs={logs} />
+          <ExportLogsButton logs={safeLogs} />
         </div>
       </CardHeader>
       <CardContent>
@@ -159,7 +162,7 @@ export function AuditLogsTable({ logs, total, currentPage, pageSize, totalPages 
               </TableRow>
             </TableHeader>
             <TableBody>
-              {logs.map((log) => {
+              {safeLogs.map((log) => {
                 return (
                   <TableRow key={log.id}>
                     <TableCell>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Users List Page Tests
  * 
  * Tests for the users list page server component.
@@ -80,7 +80,7 @@ describe('UsersPage', () => {
 
     // Act
     const { default: UsersPage } = await import('./page');
-    const result = await UsersPage();
+    const result = await UsersPage({ searchParams: {} });
 
     // Assert
     expect(usersApi.list).toHaveBeenCalledOnce();
@@ -101,7 +101,7 @@ describe('UsersPage', () => {
 
     // Act
     const { default: UsersPage } = await import('./page');
-    const result = await UsersPage();
+    const result = await UsersPage({ searchParams: {} });
 
     // Assert
     expect(usersApi.list).toHaveBeenCalledOnce();
@@ -115,6 +115,6 @@ describe('UsersPage', () => {
 
     // Act & Assert
     const { default: UsersPage } = await import('./page');
-    await expect(UsersPage()).rejects.toThrow('API Error');
+    await expect(UsersPage({ searchParams: {} })).rejects.toThrow('API Error');
   });
 });
