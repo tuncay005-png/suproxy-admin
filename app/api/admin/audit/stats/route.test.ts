@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Unit tests for Audit Stats API Route
  * 
  * Tests the proxy route implementation for audit statistics endpoint
@@ -49,25 +49,28 @@ describe('Audit Stats API Route', () => {
     });
 
     it('should forward request to backend with authentication', async () => {
-      const mockStats = {
-        total_actions: 150,
-        actions_by_type: {
-          'user.create': 25,
-          'user.update': 40,
-          'user.delete': 5,
-          'xray.client.create': 30,
-          'xray.client.delete': 10,
-          'plan.create': 5,
-          'plan.update': 15,
-          'system.config': 20,
+      // Mock backend response structure (what backend actually returns)
+      const mockBackendResponse = {
+        success: true,
+        data: {
+          total_logs: 150,
+          logs_by_action: {
+            'user.create': 25,
+            'user.update': 40,
+            'user.delete': 5,
+            'xray.client.create': 30,
+            'xray.client.delete': 10,
+            'plan.create': 5,
+            'plan.update': 15,
+            'system.config': 20,
+          },
         },
-        recent_activity_count: 45,
       };
 
       vi.mocked(fetch).mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: async () => mockStats,
+        json: async () => mockBackendResponse,
       } as Response);
 
       const request = new NextRequest('http://localhost:3000/api/admin/audit/stats');
@@ -86,9 +89,9 @@ describe('Audit Stats API Route', () => {
       );
 
       expect(response.status).toBe(200);
-      expect(data.total_actions).toBe(150);
-      expect(data.actions_by_type['user.create']).toBe(25);
-      expect(data.recent_activity_count).toBe(45);
+      expect(data.data.total_actions).toBe(150);
+      expect(data.data.actions_by_type['user.create']).toBe(25);
+      expect(data.data.recent_activity_count).toBe(150);
     });
 
     it('should handle backend errors gracefully', async () => {

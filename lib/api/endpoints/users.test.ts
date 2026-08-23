@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Unit tests for Users API Endpoint Module
  * Tests the usersApi.list and usersApi.create methods
  */
@@ -66,7 +66,7 @@ describe('usersApi', () => {
 
       const result = await usersApi.list();
 
-      expect(apiClient.get).toHaveBeenCalledWith('/api/admin/users');
+      expect(apiClient.get).toHaveBeenCalledWith('/api/admin/users?offset=0&limit=20');
       expect(apiClient.get).toHaveBeenCalledTimes(1);
       expect(result).toEqual(mockResponse);
       expect(result.data.users).toHaveLength(2);

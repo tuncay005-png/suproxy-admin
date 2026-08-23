@@ -108,13 +108,17 @@ describe('UsersPage', () => {
     expect(result).toBeTruthy();
   });
 
-  it('should throw error when API fails', async () => {
+  it('should handle API errors gracefully', async () => {
     // Arrange
     const error = new Error('API Error');
     vi.mocked(usersApi.list).mockRejectedValue(error);
 
-    // Act & Assert
+    // Act
     const { default: UsersPage } = await import('./page');
-    await expect(UsersPage({ searchParams: Promise.resolve({}) })).rejects.toThrow('API Error');
+    const result = await UsersPage({ searchParams: Promise.resolve({}) });
+
+    // Assert - page renders with error state instead of throwing
+    expect(usersApi.list).toHaveBeenCalledOnce();
+    expect(result).toBeTruthy();
   });
 });

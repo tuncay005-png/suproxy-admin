@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Dashboard Overview Page
  * 
  * Main landing page for authenticated administrators.
@@ -49,7 +49,11 @@ import type { AuditLog } from '@/types/audit';
  * This runs server-side during page load
  */
 async function getDashboardData() {
+  const startTime = performance.now();
+  console.log('[DASHBOARD-TIMING] Starting data fetch...');
+  
   try {
+    const fetchStart = performance.now();
     // Fetch all dashboard data in parallel
     const [stats, health, auditLogs, servers, plans] = await Promise.allSettled([
       systemApi.getStats(),
@@ -58,6 +62,9 @@ async function getDashboardData() {
       serversApi.list(),
       plansApi.list(),
     ]);
+    
+    const fetchTime = performance.now() - fetchStart;
+    console.log(`[DASHBOARD-TIMING] Parallel fetch completed in ${fetchTime.toFixed(2)}ms`);
 
     // Log failures for debugging
     if (stats.status === 'rejected') {
@@ -76,6 +83,9 @@ async function getDashboardData() {
       console.error('[DASHBOARD] Failed to fetch plans:', plans.reason);
     }
 
+    const totalTime = performance.now() - startTime;
+    console.log(`[DASHBOARD-TIMING] Total getDashboardData time: ${totalTime.toFixed(2)}ms`);
+    
     return {
       stats: stats.status === 'fulfilled' ? stats.value : null,
       health: health.status === 'fulfilled' ? health.value : null,
@@ -86,6 +96,9 @@ async function getDashboardData() {
   } catch (error) {
     console.error('[DASHBOARD] Error fetching dashboard data:', error);
     // Return null values - dashboard will display unavailable state
+    const totalTime = performance.now() - startTime;
+    console.log(`[DASHBOARD-TIMING] Total getDashboardData time: ${totalTime.toFixed(2)}ms`);
+    
     return {
       stats: null,
       health: null,
@@ -101,24 +114,24 @@ export default async function DashboardPage() {
 
   // Calculate values from fetched data
   // systemApi.getStats returns ApiResponse<{...}> where data contains the flat stats object
-  const totalUsers = stats?.data?.total_users ?? '—';
+  const totalUsers = stats?.data?.total_users ?? 'â€”';
   const activeUsers = stats?.data?.active_users ?? 0;
   
-  const totalXrayInstances = stats?.data?.total_xray_instances ?? '—';
+  const totalXrayInstances = stats?.data?.total_xray_instances ?? 'â€”';
   const activeXrayInstances = stats?.data?.active_xray_instances ?? 0;
   
   // Get recent audit actions count from auditApi.getLogs total
   // Use the total count from audit logs response for accurate count
-  const recentAuditActions = auditLogs?.data?.total ?? '—';
+  const recentAuditActions = auditLogs?.data?.total ?? 'â€”';
   
   // Get server count from serversApi.list
   // serversApi.list returns ApiResponse<ServersListResponse> where data.servers is the array
-  const serverCount = servers?.data?.servers?.length ?? '—';
+  const serverCount = servers?.data?.servers?.length ?? 'â€”';
   const onlineServers = servers?.data?.servers?.filter(s => s.status === 'online').length ?? 0;
   
   // Get plan count from plansApi.list
   // plansApi.list returns ApiResponse<PlansListResponse> where data.plans is the array
-  const planCount = plans?.data?.plans?.length ?? '—';
+  const planCount = plans?.data?.plans?.length ?? 'â€”';
   const activePlans = plans?.data?.plans?.filter(p => p.active).length ?? 0;
   
   // Get recent logs from audit logs response
@@ -205,3 +218,4 @@ export default async function DashboardPage() {
     </div>
   );
 }
+

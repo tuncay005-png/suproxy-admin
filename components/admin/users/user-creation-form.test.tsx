@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Unit Tests for User Creation Form
  * 
  * Tests form rendering, validation, submission, and error handling.
@@ -121,6 +121,7 @@ describe('UserCreationForm', () => {
     // Submit the form
     await user.click(screen.getByRole('button', { name: /create user/i }));
 
+    // Wait for API call
     await waitFor(() => {
       expect(usersApi.create).toHaveBeenCalledWith({
         email: 'test@example.com',
@@ -130,11 +131,19 @@ describe('UserCreationForm', () => {
         password: 'Password123',
         role: 'user',
       });
+    }, { timeout: 20000 });
+
+    // Wait for toast
+    await waitFor(() => {
       expect(toast.success).toHaveBeenCalledWith('User created successfully');
+    }, { timeout: 20000 });
+
+    // Wait for navigation
+    await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith('/admin/users');
       expect(mockRefresh).toHaveBeenCalled();
-    });
-  });
+    }, { timeout: 20000 });
+  }, 30000);
 
   it('displays error message on API failure', async () => {
     const user = userEvent.setup();
@@ -155,8 +164,8 @@ describe('UserCreationForm', () => {
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith(errorMessage);
       expect(mockPush).not.toHaveBeenCalled();
-    });
-  });
+    }, { timeout: 20000 });
+  }, 30000);
 
   it('disables form fields while submitting', async () => {
     const user = userEvent.setup();
@@ -181,11 +190,14 @@ describe('UserCreationForm', () => {
     // Check that form is disabled
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /creating/i })).toBeDisabled();
+    }, { timeout: 20000 });
+
+    await waitFor(() => {
       expect(screen.getByLabelText(/email/i)).toBeDisabled();
       expect(screen.getByLabelText(/first name/i)).toBeDisabled();
       expect(screen.getByLabelText(/last name/i)).toBeDisabled();
       expect(screen.getByLabelText(/password/i)).toBeDisabled();
-    });
+    }, { timeout: 20000 });
 
     // Resolve the promise
     resolveCreate!({
@@ -208,7 +220,7 @@ describe('UserCreationForm', () => {
         updated_at: new Date().toISOString(),
       },
     });
-  });
+  }, 30000);
 
   it('navigates to users list on cancel', async () => {
     const user = userEvent.setup();

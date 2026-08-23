@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Plans API Route
  * 
  * GET /api/plans - List all plans
@@ -11,8 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { SESSION_COOKIE_CONFIG } from '@/lib/auth/session';
+import { getSessionTokenFromRequest } from '@/lib/auth/cookie-helpers';
 
 export async function GET(request: NextRequest) {
   try {
@@ -61,9 +60,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Get session token from httpOnly cookie
-    const cookieStore = await cookies();
-    const sessionToken = cookieStore.get(SESSION_COOKIE_CONFIG.name);
+    // Get session token from request headers (fast, synchronous)
+    const sessionToken = getSessionTokenFromRequest(request);
 
     if (!sessionToken) {
       return NextResponse.json(
@@ -91,7 +89,7 @@ export async function POST(request: NextRequest) {
     const backendResponse = await fetch(backendEndpoint, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${sessionToken.value}`,
+        'Authorization': `Bearer ${sessionToken}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),

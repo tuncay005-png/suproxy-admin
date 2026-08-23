@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Login Page Tests
  * 
  * Unit tests for the Login Page to verify:
@@ -18,6 +18,9 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: vi.fn(),
     refresh: vi.fn(),
+  }),
+  useSearchParams: () => ({
+    get: vi.fn(() => null),
   }),
 }));
 
