@@ -1,4 +1,4 @@
-import type { ApiError as ApiErrorType } from '@/types/api';
+﻿import type { ApiError as ApiErrorType } from '@/types/api';
 import { multiTabSync } from '@/lib/auth/multi-tab-sync';
 import { attemptServerSideRefresh } from '@/lib/api/server-refresh-helper';
 
@@ -54,7 +54,6 @@ export class ApiError extends Error implements ApiErrorType {
 class ApiClient {
   private baseURL: string;
   private refreshPromise: Promise<boolean> | null = null;
-  private isRefreshing: boolean = false;
 
   constructor() {
     this.baseURL = '';
@@ -81,22 +80,13 @@ class ApiClient {
       console.log('[API-CLIENT] Refresh already in progress, waiting...');
       return await this.refreshPromise;
     }
-    
-    if (this.isRefreshing) {
-      console.log('[API-CLIENT] Refresh flag already set, aborting duplicate attempt');
-      return false;
-    }
-
     console.log('[API-CLIENT] Starting token refresh...');
-    this.isRefreshing = true;
     this.refreshPromise = this.executeTokenRefresh();
-    
     try {
       const result = await this.refreshPromise;
       return result;
     } finally {
       this.refreshPromise = null;
-      this.isRefreshing = false;
     }
   }
 
@@ -131,15 +121,15 @@ class ApiClient {
     }
   }
   
-  private async request<T>(endpoint: string, options?: RequestInit, retryCount: number = 0): Promise<T> {
+  private async request<T>(endpoint: string, options?: RequestInit, _isRetryAfterRefresh = false): Promise<T> {
     let url: string;
     const isServerSide = typeof window === 'undefined';
     
     if (isServerSide && !endpoint.startsWith('http')) {
       const nextServerUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-      url = \\\\;
+      url = `${nextServerUrl}${endpoint}`;
     } else {
-      url = \\\\;
+      url = `${this.baseURL}${endpoint}`;
     }
 
     try {
@@ -151,7 +141,7 @@ class ApiClient {
           const cookieStore = await cookies();
           const allCookies = cookieStore.getAll();
           if (allCookies.length > 0) {
-            const cookieHeader = allCookies.map(cookie => \\=\\).join('; ');
+            const cookieHeader = allCookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
             (headers as Record<string, string>)['Cookie'] = cookieHeader;
           }
         } catch (error) {
@@ -161,8 +151,8 @@ class ApiClient {
 
       const response = await this.fetchWithTimeout(url, { ...options, credentials: 'include', headers });
 
-      // TOKEN_EXPIRED handling - ONLY RETRY ONCE
-      if (!response.ok && response.status === 401 && !endpoint.includes('/api/auth/refresh') && !endpoint.includes('/api/auth/login') && retryCount === 0) {
+      // TOKEN_EXPIRED handling for BOTH server and client
+      if (!response.ok && response.status === 401 && !endpoint.includes('/api/auth/refresh') && !_isRetryAfterRefresh) {
         let shouldRetryWithRefresh = false;
         try {
           const errorData = await response.clone().json();
@@ -171,18 +161,11 @@ class ApiClient {
           
           if (errorCode === 'TOKEN_EXPIRED' || errorMessage.includes('token has expired') || errorMessage.includes('access token has expired')) {
             shouldRetryWithRefresh = true;
-            console.log(\[API-CLIENT] TOKEN_EXPIRED detected (\), attempting refresh...\);
-          } else if (errorCode === 'TOKEN_REVOKED' || errorMessage.includes('revoked')) {
-            console.log('[API-CLIENT] Token revoked, redirecting to login');
-            if (!isServerSide) {
-              await this.handleGracefulLogout();
-            }
-            throw new ApiError('Session has been revoked. Please log in again.', 401, 'SESSION_REVOKED');
+            console.log(`[API-CLIENT] TOKEN_EXPIRED detected (${isServerSide ? 'server-side' : 'client-side'}), attempting refresh...`);
           } else {
-            console.log(\[API-CLIENT] Non-token 401 error, not refreshing. Code: \\);
+            console.log(`[API-CLIENT] Non-token 401 error, not refreshing. Code: ${errorCode}`);
           }
-        } catch (parseError) {
-          if (parseError instanceof ApiError) throw parseError;
+        } catch {
           console.log('[API-CLIENT] Could not parse 401 error, skipping refresh');
         }
 
@@ -191,15 +174,14 @@ class ApiClient {
           const refreshSuccess = isServerSide ? await attemptServerSideRefresh() : await this.attemptTokenRefresh();
           
           if (refreshSuccess) {
-            console.log(\[API-CLIENT] Retrying original request after successful refresh (\)\);
+            console.log(`[API-CLIENT] Retrying original request after successful refresh (${isServerSide ? 'server' : 'client'})`);
             const retryOptions = options ? { ...options } : undefined;
             if (retryOptions && options?.body) {
               retryOptions.body = options.body;
             }
-            // CRITICAL: Pass retryCount=1 to prevent infinite loop
-            return this.request<T>(endpoint, retryOptions, 1);
+            return this.request<T>(endpoint, retryOptions, true);
           } else {
-            console.log('[API-CLIENT] Refresh failed, session expired');
+            console.log('[API-CLIENT] Refresh failed');
             if (!isServerSide) {
               await this.handleGracefulLogout();
             }
@@ -271,7 +253,7 @@ class ApiClient {
     if (!message) {
       message = ApiError.getDefaultMessage(response.status);
     }
-    return new ApiError(message, response.status, \HTTP_\\, details);
+    return new ApiError(message, response.status, `HTTP_${response.status}`, details);
   }
 
   async get<T>(endpoint: string): Promise<T> {

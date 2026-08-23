@@ -136,6 +136,8 @@ export function AdminSidebar({ className, isOpen = false, onClose }: AdminSideba
 
       {/* Sidebar - Mobile drawer + Desktop fixed */}
       <aside
+        role="navigation"
+        aria-label="Main navigation"
         className={cn(
           // Mobile styles
           'fixed inset-y-0 left-0 z-50 w-64 transform border-r bg-card transition-transform duration-300 ease-in-out md:relative md:translate-x-0',

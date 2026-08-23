@@ -301,7 +301,7 @@ This implementation plan converts the Full Admin Control Center design into exec
     - Make Xray expandable/collapsible submenu
     - _Requirements: 12.4_
 
-- [ ] 8. Checkpoint - Test Xray Instances Module
+- [x] 8. Checkpoint - Test Xray Instances Module
   - Verify instances list loads with real data
   - Test start, stop, restart, reload operations
   - Verify health and stats display correctly
@@ -478,7 +478,7 @@ This implementation plan converts the Full Admin Control Center design into exec
     - Update stat card to be clickable linking to /admin/plans
     - _Requirements: 8.11, 12.2_
 
-- [ ] 13. Checkpoint - Test Core Modules
+- [x] 13. Checkpoint - Test Core Modules
   - Verify all CRUD operations work for users, plans, sessions
   - Test all Xray operations (instances, inbounds, clients)
   - Verify server and node display works
@@ -671,7 +671,7 @@ This implementation plan converts the Full Admin Control Center design into exec
     - Use online contrast checker tool to verify critical UI elements
     - _Requirements: 15.10_
 
-- [ ] 18. Final Integration and Testing
+- [x] 18. Final Integration and Testing
   - Integrate all modules with navigation
   - Verify end-to-end workflows
   - Test error handling and edge cases
@@ -711,7 +711,7 @@ This implementation plan converts the Full Admin Control Center design into exec
     - Verify all operations refresh data correctly
     - _Requirements: 18.3-18.6_
 
-  - [ ] 18.5 Test error handling comprehensively
+  - [x] 18.5 Test error handling comprehensively
     - Test network error (stop Go backend): should show "Unable to connect" message
     - Test 401 error (invalid session): should redirect to login
     - Test 403 error (permission denied): should show "Access Denied"
@@ -721,7 +721,7 @@ This implementation plan converts the Full Admin Control Center design into exec
     - Verify all error messages are user-friendly (no raw backend errors shown)
     - _Requirements: 13.3-13.8, 18.7_
 
-  - [ ] 18.6 Test loading states and empty states
+  - [x] 18.6 Test loading states and empty states
     - Verify skeleton loaders display during page navigation
     - Verify empty states display when no data exists
     - Verify "No results found" displays for empty search results
@@ -729,7 +729,7 @@ This implementation plan converts the Full Admin Control Center design into exec
     - Test error boundaries display when components fail
     - _Requirements: 14.1-14.8_
 
-  - [ ] 18.7 Test responsive design on multiple devices
+  - [x] 18.7 Test responsive design on multiple devices
     - Test all pages on mobile viewport (320px-767px)
     - Test all pages on tablet viewport (768px-1023px)
     - Test all pages on desktop viewport (1024px+)
@@ -738,7 +738,7 @@ This implementation plan converts the Full Admin Control Center design into exec
     - Verify sidebar behavior on all viewports
     - _Requirements: 15.1-15.4_
 
-  - [ ] 18.8 Test accessibility with keyboard and screen reader
+  - [x] 18.8 Test accessibility with keyboard and screen reader
     - Navigate entire application using keyboard only (Tab, Shift+Tab, Enter, Escape)
     - Verify all buttons, links, form fields are keyboard accessible
     - Verify focus indicators are visible
@@ -747,7 +747,7 @@ This implementation plan converts the Full Admin Control Center design into exec
     - Verify form errors are announced
     - _Requirements: 15.8-15.9_
 
-  - [ ] 18.9 Verify data display from backend
+  - [x] 18.9 Verify data display from backend
     - Verify dashboard displays real data (not placeholder "—" values)
     - Verify all stat cards show real counts from backend
     - Verify all list pages show real data
@@ -755,7 +755,7 @@ This implementation plan converts the Full Admin Control Center design into exec
     - Verify audit logs display real log entries
     - _Requirements: 10.9, 18.2-18.3_
 
-  - [ ] 18.10 Final regression testing
+  - [x] 18.10 Final regression testing
     - Verify existing user list and view functionality still works (from admin-dashboard spec)
     - Verify login and logout still work
     - Verify dashboard layout is not broken
@@ -765,7 +765,7 @@ This implementation plan converts the Full Admin Control Center design into exec
     - Verify no console errors in browser during normal usage
     - _Requirements: 18.10_
 
-- [ ] 19. Final Checkpoint - Production Readiness
+- [x] 19. Final Checkpoint - Production Readiness
   - All TypeScript compiles without errors
   - All 47 API proxy routes verified working
   - All manual test checklists completed

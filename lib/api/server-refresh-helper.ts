@@ -6,12 +6,10 @@
  * 
  * Architecture:
  * - Client-side: Browser API calls use existing refresh in lib/api/client.ts
- * - Server-side: RSC page loads use this helper
+ * - Server-side: RSC page loads use this helper to call /api/auth/refresh
  * 
  * @module lib/api/server-refresh-helper
  */
-
-import { refreshTokenAction } from '@/app/actions/auth';
 
 /**
  * Single-flight refresh promise for server-side
@@ -48,18 +46,35 @@ export async function attemptServerSideRefresh(): Promise<boolean> {
 }
 
 /**
- * Execute the actual server-side refresh
- * Uses the existing refreshTokenAction
+ * Execute the actual server-side refresh by calling /api/auth/refresh
+ * Uses internal Next.js API route
  */
 async function executeServerRefresh(): Promise<boolean> {
   try {
-    const result = await refreshTokenAction();
+    const nextServerUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const refreshUrl = ${nextServerUrl}/api/auth/refresh;
     
-    if (result.success) {
+    console.log('[SERVER-REFRESH] Calling refresh endpoint:', refreshUrl);
+    
+    // Import cookies to forward them to the API route
+    const { cookies } = await import('next/headers');
+    const cookieStore = await cookies();
+    const allCookies = cookieStore.getAll();
+    const cookieHeader = allCookies.map(cookie => ${cookie.name}=).join('; ');
+    
+    const refreshResponse = await fetch(refreshUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cookie': cookieHeader, // Forward cookies to API route
+      },
+    });
+    
+    if (refreshResponse.ok) {
       console.log('[SERVER-REFRESH] Token refresh successful');
       return true;
     } else {
-      console.warn('[SERVER-REFRESH] Token refresh failed');
+      console.warn('[SERVER-REFRESH] Token refresh failed with status:', refreshResponse.status);
       return false;
     }
   } catch (error) {

@@ -1,0 +1,109 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "18.8 Test accessibility with keyboard and screen reader": [
+      {
+        "executionId": "d2cab013-21d1-4a32-8a3d-566046ffa1ae",
+        "chatSessionId": "sess_011ee93f-20a1-4393-bd7f-c063c30e5650",
+        "timestamp": 1787514058718
+      },
+      {
+        "executionId": "1042ca94-97e2-4ec7-bf19-bc98c1e800e7",
+        "chatSessionId": "sess_011ee93f-20a1-4393-bd7f-c063c30e5650",
+        "timestamp": 1787514341381
+      },
+      {
+        "executionId": "f3bdab33-5ba9-41b2-8947-09b2fb591284",
+        "chatSessionId": "sess_011ee93f-20a1-4393-bd7f-c063c30e5650",
+        "timestamp": 1787515873045
+      }
+    ],
+    "18.9 Verify data display from backend": [
+      {
+        "executionId": "d2cab013-21d1-4a32-8a3d-566046ffa1ae",
+        "chatSessionId": "sess_011ee93f-20a1-4393-bd7f-c063c30e5650",
+        "timestamp": 1787514061617
+      },
+      {
+        "executionId": "1042ca94-97e2-4ec7-bf19-bc98c1e800e7",
+        "chatSessionId": "sess_011ee93f-20a1-4393-bd7f-c063c30e5650",
+        "timestamp": 1787514344727
+      },
+      {
+        "executionId": "f3bdab33-5ba9-41b2-8947-09b2fb591284",
+        "chatSessionId": "sess_011ee93f-20a1-4393-bd7f-c063c30e5650",
+        "timestamp": 1787516235320
+      }
+    ],
+    "18.10 Final regression testing": [
+      {
+        "executionId": "87683d77-1454-48c3-965c-ce02bc4c3b34",
+        "chatSessionId": "sess_011ee93f-20a1-4393-bd7f-c063c30e5650",
+        "timestamp": 1787516348051
+      },
+      {
+        "executionId": "87683d77-1454-48c3-965c-ce02bc4c3b34",
+        "chatSessionId": "sess_011ee93f-20a1-4393-bd7f-c063c30e5650",
+        "timestamp": 1787516692098
+      }
+    ],
+    "18. Final Integration and Testing": [
+      {
+        "executionId": "87683d77-1454-48c3-965c-ce02bc4c3b34",
+        "chatSessionId": "sess_011ee93f-20a1-4393-bd7f-c063c30e5650",
+        "timestamp": 1787516692723
+      }
+    ],
+    "8. Checkpoint - Test Xray Instances Module": [
+      {
+        "executionId": "87683d77-1454-48c3-965c-ce02bc4c3b34",
+        "chatSessionId": "sess_011ee93f-20a1-4393-bd7f-c063c30e5650",
+        "timestamp": 1787516709024
+      },
+      {
+        "executionId": "c8f5aa3f-e048-4e35-b229-d8df84b2a873",
+        "chatSessionId": "sess_011ee93f-20a1-4393-bd7f-c063c30e5650",
+        "timestamp": 1787517541037
+      }
+    ],
+    "13. Checkpoint - Test Core Modules": [
+      {
+        "executionId": "09498b67-f430-42f5-89bc-b310abb1621b",
+        "chatSessionId": "sess_011ee93f-20a1-4393-bd7f-c063c30e5650",
+        "timestamp": 1787519605321
+      },
+      {
+        "executionId": "5f5ce21c-8e20-4be0-9585-bf416e784165",
+        "chatSessionId": "sess_011ee93f-20a1-4393-bd7f-c063c30e5650",
+        "timestamp": 1787519858255
+      },
+      {
+        "executionId": "8ac537c1-aa3e-4019-a53e-2aa1badba4e1",
+        "chatSessionId": "sess_011ee93f-20a1-4393-bd7f-c063c30e5650",
+        "timestamp": 1787520083766
+      },
+      {
+        "executionId": "edce98df-8ba5-4636-8ac7-c8179a0e9046",
+        "chatSessionId": "sess_011ee93f-20a1-4393-bd7f-c063c30e5650",
+        "timestamp": 1787520414755
+      },
+      {
+        "executionId": "edce98df-8ba5-4636-8ac7-c8179a0e9046",
+        "chatSessionId": "sess_011ee93f-20a1-4393-bd7f-c063c30e5650",
+        "timestamp": 1787520474492
+      }
+    ],
+    "19. Final Checkpoint - Production Readiness": [
+      {
+        "executionId": "edce98df-8ba5-4636-8ac7-c8179a0e9046",
+        "chatSessionId": "sess_011ee93f-20a1-4393-bd7f-c063c30e5650",
+        "timestamp": 1787520484537
+      },
+      {
+        "executionId": "edce98df-8ba5-4636-8ac7-c8179a0e9046",
+        "chatSessionId": "sess_011ee93f-20a1-4393-bd7f-c063c30e5650",
+        "timestamp": 1787520575013
+      }
+    ]
+  }
+}
