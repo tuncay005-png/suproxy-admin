@@ -13,8 +13,7 @@
  *        Set new httpOnly cookies (access_token + refresh_token)
  *                ↓
  *        Return success/failure
- * 
- * ## Security
+ * \n * ## Security
  * 
  * - Refresh token stored in httpOnly cookie
  * - New tokens rotated on each refresh (backend handles rotation)
@@ -27,16 +26,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { SESSION_COOKIE_CONFIG, REFRESH_COOKIE_CONFIG } from '@/lib/auth/session';
 
-/**
- * POST handler for token refresh
- * 
- * @returns JSON response with success status
- */
 export async function POST(request: NextRequest) {
   try {
     console.log('[REFRESH-ROUTE] Token refresh request received');
     
-    // Get cookies from request
     const cookieStore = await cookies();
     const refreshToken = cookieStore.get(REFRESH_COOKIE_CONFIG.name);
 
@@ -48,7 +41,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get backend API URL
     const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
     if (!backendUrl) {
       console.error('[REFRESH-ROUTE] NEXT_PUBLIC_API_BASE_URL not configured');
@@ -58,7 +50,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Call backend refresh endpoint
     const backendEndpoint = `${backendUrl}/api/v1/auth/refresh`;
     console.log('[REFRESH-ROUTE] Calling backend refresh endpoint');
 
@@ -72,18 +63,15 @@ export async function POST(request: NextRequest) {
       }),
     });
 
-    // Handle backend refresh failure
     if (!backendResponse.ok) {
       const errorData = await backendResponse.json().catch(() => ({}));
       console.error('[REFRESH-ROUTE] Backend refresh failed:', backendResponse.status, errorData);
 
-      // Clear cookies on refresh failure
       const response = NextResponse.json(
         { success: false, error: 'Token refresh failed' },
         { status: 401 }
       );
 
-      // Clear both session and refresh tokens
       response.cookies.set(SESSION_COOKIE_CONFIG.name, '', {
         ...SESSION_COOKIE_CONFIG,
         maxAge: 0,
@@ -98,23 +86,19 @@ export async function POST(request: NextRequest) {
       return response;
     }
 
-    // Parse successful response
     const data = await backendResponse.json();
     const { access_token, refresh_token } = data.data;
 
     console.log('[REFRESH-ROUTE] Backend refresh successful, setting new cookies');
 
-    // Create success response
     const response = NextResponse.json({ success: true });
 
-    // Set new access token cookie
     response.cookies.set(
       SESSION_COOKIE_CONFIG.name,
       access_token,
       SESSION_COOKIE_CONFIG
     );
 
-    // Set new refresh token cookie (token rotation)
     response.cookies.set(
       REFRESH_COOKIE_CONFIG.name,
       refresh_token,
@@ -132,7 +116,6 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
 
-    // Clear cookies on error
     response.cookies.set(SESSION_COOKIE_CONFIG.name, '', {
       ...SESSION_COOKIE_CONFIG,
       maxAge: 0,
