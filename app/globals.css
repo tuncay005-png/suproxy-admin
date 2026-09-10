@@ -28,25 +28,25 @@
 }
 
 .dark {
-  --color-background: oklch(9% 0 0);
-  --color-foreground: oklch(98% 0 0);
-  --color-card: oklch(9% 0 0);
-  --color-card-foreground: oklch(98% 0 0);
-  --color-popover: oklch(9% 0 0);
-  --color-popover-foreground: oklch(98% 0 0);
-  --color-primary: oklch(98% 0 0);
-  --color-primary-foreground: oklch(9% 0 0);
-  --color-secondary: oklch(14.9% 0 0);
-  --color-secondary-foreground: oklch(98% 0 0);
-  --color-muted: oklch(14.9% 0 0);
-  --color-muted-foreground: oklch(63.9% 0 0);
-  --color-accent: oklch(14.9% 0 0);
-  --color-accent-foreground: oklch(98% 0 0);
-  --color-destructive: oklch(30.6% 0.135 29.233);
+  --color-background: oklch(13% 0 0);
+  --color-foreground: oklch(95% 0 0);
+  --color-card: oklch(16% 0 0);
+  --color-card-foreground: oklch(95% 0 0);
+  --color-popover: oklch(14% 0 0);
+  --color-popover-foreground: oklch(95% 0 0);
+  --color-primary: oklch(63% 0.25 265);
+  --color-primary-foreground: oklch(98% 0 0);
+  --color-secondary: oklch(20% 0 0);
+  --color-secondary-foreground: oklch(95% 0 0);
+  --color-muted: oklch(20% 0 0);
+  --color-muted-foreground: oklch(65% 0 0);
+  --color-accent: oklch(22% 0 0);
+  --color-accent-foreground: oklch(95% 0 0);
+  --color-destructive: oklch(48% 0.22 29.233);
   --color-destructive-foreground: oklch(98% 0 0);
-  --color-border: oklch(14.9% 0 0);
-  --color-input: oklch(14.9% 0 0);
-  --color-ring: oklch(83.1% 0 0);
+  --color-border: oklch(22% 0 0);
+  --color-input: oklch(22% 0 0);
+  --color-ring: oklch(63% 0.25 265);
 }
 
 body {
