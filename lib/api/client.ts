@@ -187,23 +187,29 @@ class ApiClient {
         }
 
         if (shouldRetryWithRefresh) {
-          // Use server-side or client-side refresh based on environment
-          const refreshSuccess = isServerSide ? await attemptServerSideRefresh() : await this.attemptTokenRefresh();
-          
-          if (refreshSuccess) {
-            console.log(`[API-CLIENT] Retrying original request after successful refresh (${endpoint})`);
-            const retryOptions = options ? { ...options } : undefined;
-            if (retryOptions && options?.body) {
-              retryOptions.body = options.body;
-            }
-            // CRITICAL: Pass retryCount=1 to prevent infinite loop
-            return this.request<T>(endpoint, retryOptions, 1);
+          if (isServerSide) {
+            // Server-side: trigger refresh but don't retry in SSR context
+            // The refresh will update cookies for subsequent client requests
+            await attemptServerSideRefresh();
+            console.log('[API-CLIENT] Server-side refresh triggered, throwing error for client retry');
+            throw new ApiError('Session expired. Please refresh the page.', 401, 'SESSION_EXPIRED');
           } else {
-            console.log('[API-CLIENT] Refresh failed, session expired');
-            if (!isServerSide) {
+            // Client-side: attempt refresh and retry
+            const refreshSuccess = await this.attemptTokenRefresh();
+            
+            if (refreshSuccess) {
+              console.log(`[API-CLIENT] Retrying original request after successful refresh (${endpoint})`);
+              const retryOptions = options ? { ...options } : undefined;
+              if (retryOptions && options?.body) {
+                retryOptions.body = options.body;
+              }
+              // CRITICAL: Pass retryCount=1 to prevent infinite loop
+              return this.request<T>(endpoint, retryOptions, 1);
+            } else {
+              console.log('[API-CLIENT] Refresh failed, session expired');
               await this.handleGracefulLogout();
+              throw new ApiError('Session expired. Please log in again.', 401, 'SESSION_EXPIRED');
             }
-            throw new ApiError('Session expired. Please log in again.', 401, 'SESSION_EXPIRED');
           }
         }
       }
