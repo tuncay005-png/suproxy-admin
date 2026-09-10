@@ -137,9 +137,9 @@ class ApiClient {
     
     if (isServerSide && !endpoint.startsWith('http')) {
       const nextServerUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-      url = \\\\;
+      url = `${nextServerUrl}${endpoint}`;
     } else {
-      url = \\\\;
+      url = `${this.baseURL}${endpoint}`;
     }
 
     try {
@@ -151,7 +151,7 @@ class ApiClient {
           const cookieStore = await cookies();
           const allCookies = cookieStore.getAll();
           if (allCookies.length > 0) {
-            const cookieHeader = allCookies.map(cookie => \\=\\).join('; ');
+            const cookieHeader = allCookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
             (headers as Record<string, string>)['Cookie'] = cookieHeader;
           }
         } catch (error) {
@@ -171,7 +171,7 @@ class ApiClient {
           
           if (errorCode === 'TOKEN_EXPIRED' || errorMessage.includes('token has expired') || errorMessage.includes('access token has expired')) {
             shouldRetryWithRefresh = true;
-            console.log(\[API-CLIENT] TOKEN_EXPIRED detected (\), attempting refresh...\);
+            console.log(`[API-CLIENT] TOKEN_EXPIRED detected (${errorCode}), attempting refresh...`);
           } else if (errorCode === 'TOKEN_REVOKED' || errorMessage.includes('revoked')) {
             console.log('[API-CLIENT] Token revoked, redirecting to login');
             if (!isServerSide) {
@@ -179,7 +179,7 @@ class ApiClient {
             }
             throw new ApiError('Session has been revoked. Please log in again.', 401, 'SESSION_REVOKED');
           } else {
-            console.log(\[API-CLIENT] Non-token 401 error, not refreshing. Code: \\);
+            console.log(`[API-CLIENT] Non-token 401 error, not refreshing. Code: ${errorCode}`);
           }
         } catch (parseError) {
           if (parseError instanceof ApiError) throw parseError;
@@ -191,7 +191,7 @@ class ApiClient {
           const refreshSuccess = isServerSide ? await attemptServerSideRefresh() : await this.attemptTokenRefresh();
           
           if (refreshSuccess) {
-            console.log(\[API-CLIENT] Retrying original request after successful refresh (\)\);
+            console.log(`[API-CLIENT] Retrying original request after successful refresh (${endpoint})`);
             const retryOptions = options ? { ...options } : undefined;
             if (retryOptions && options?.body) {
               retryOptions.body = options.body;
@@ -271,7 +271,7 @@ class ApiClient {
     if (!message) {
       message = ApiError.getDefaultMessage(response.status);
     }
-    return new ApiError(message, response.status, \HTTP_\\, details);
+    return new ApiError(message, response.status, `HTTP_${response.status}`, details);
   }
 
   async get<T>(endpoint: string): Promise<T> {
