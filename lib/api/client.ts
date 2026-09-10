@@ -60,7 +60,7 @@ class ApiClient {
     this.baseURL = '';
   }
 
-  private async fetchWithTimeout(url: string, options: RequestInit, timeout: number = 30000): Promise<Response> {
+  private async fetchWithTimeout(url: string, options: RequestInit, timeout: number = 60000): Promise<Response> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
     try {
