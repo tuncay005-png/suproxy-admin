@@ -52,7 +52,7 @@ export async function attemptServerSideRefresh(): Promise<boolean> {
 async function executeServerRefresh(): Promise<boolean> {
   try {
     const nextServerUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-    const refreshUrl = ${nextServerUrl}/api/auth/refresh;
+    const refreshUrl = `${nextServerUrl}/api/auth/refresh`;
     
     console.log('[SERVER-REFRESH] Calling refresh endpoint:', refreshUrl);
     
@@ -60,7 +60,7 @@ async function executeServerRefresh(): Promise<boolean> {
     const { cookies } = await import('next/headers');
     const cookieStore = await cookies();
     const allCookies = cookieStore.getAll();
-    const cookieHeader = allCookies.map(cookie => ${cookie.name}=).join('; ');
+    const cookieHeader = allCookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
     
     const refreshResponse = await fetch(refreshUrl, {
       method: 'POST',
