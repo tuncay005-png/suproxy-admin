@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Call backend refresh endpoint
-    const backendEndpoint = ${backendUrl}/api/v1/auth/refresh;
+    const backendEndpoint = `${backendUrl}/api/v1/auth/refresh`;
     console.log('[REFRESH-ROUTE] Calling backend refresh endpoint');
 
     const backendResponse = await fetch(backendEndpoint, {
