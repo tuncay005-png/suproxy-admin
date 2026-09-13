@@ -11,6 +11,14 @@ describe('SystemHealthCard', () => {
   it('renders healthy system status with green badge', () => {
     const healthData: SystemHealth = {
       status: 'healthy',
+      cpu_usage: 45,
+      ram_used: 4096,
+      ram_total: 8192,
+      disk_used: 50,
+      disk_total: 100,
+      swap_used: 0,
+      swap_total: 2048,
+      uptime: 86400,
       database: 'connected',
       timestamp: '2024-01-01T12:00:00Z',
     };
@@ -25,6 +33,14 @@ describe('SystemHealthCard', () => {
   it('renders degraded system status with yellow badge', () => {
     const healthData: SystemHealth = {
       status: 'degraded',
+      cpu_usage: 75,
+      ram_used: 6144,
+      ram_total: 8192,
+      disk_used: 80,
+      disk_total: 100,
+      swap_used: 512,
+      swap_total: 2048,
+      uptime: 86400,
       database: 'connected',
       timestamp: '2024-01-01T12:00:00Z',
     };
@@ -37,6 +53,14 @@ describe('SystemHealthCard', () => {
   it('renders unhealthy system status with red badge', () => {
     const healthData: SystemHealth = {
       status: 'unhealthy',
+      cpu_usage: 95,
+      ram_used: 7900,
+      ram_total: 8192,
+      disk_used: 95,
+      disk_total: 100,
+      swap_used: 1900,
+      swap_total: 2048,
+      uptime: 86400,
       database: 'disconnected',
       timestamp: '2024-01-01T12:00:00Z',
     };
@@ -57,6 +81,14 @@ describe('SystemHealthCard', () => {
   it('displays timestamp', () => {
     const healthData: SystemHealth = {
       status: 'healthy',
+      cpu_usage: 45,
+      ram_used: 4096,
+      ram_total: 8192,
+      disk_used: 50,
+      disk_total: 100,
+      swap_used: 0,
+      swap_total: 2048,
+      uptime: 86400,
       database: 'connected',
       timestamp: '2024-01-01T12:00:00Z',
     };

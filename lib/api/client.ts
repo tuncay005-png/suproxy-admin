@@ -60,7 +60,7 @@ class ApiClient {
     this.baseURL = '';
   }
 
-  private async fetchWithTimeout(url: string, options: RequestInit, timeout: number = 60000): Promise<Response> {
+  private async fetchWithTimeout(url: string, options: RequestInit, timeout: number = 120000): Promise<Response> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
     try {
@@ -78,16 +78,13 @@ class ApiClient {
 
   private async attemptTokenRefresh(): Promise<boolean> {
     if (this.refreshPromise) {
-      console.log('[API-CLIENT] Refresh already in progress, waiting...');
       return await this.refreshPromise;
     }
     
     if (this.isRefreshing) {
-      console.log('[API-CLIENT] Refresh flag already set, aborting duplicate attempt');
       return false;
     }
 
-    console.log('[API-CLIENT] Starting token refresh...');
     this.isRefreshing = true;
     this.refreshPromise = this.executeTokenRefresh();
     
@@ -104,7 +101,6 @@ class ApiClient {
     try {
       const refreshResponse = await this.fetchWithTimeout('/api/auth/refresh', { method: 'POST', credentials: 'include' }, 5000);
       if (refreshResponse.ok) {
-        console.log('[API-CLIENT] Token refresh successful');
         multiTabSync.notifyTokenRefreshed();
         return true;
       } else {
@@ -118,14 +114,12 @@ class ApiClient {
   }
 
   private async handleGracefulLogout(): Promise<void> {
-    console.log('[API-CLIENT] Performing graceful logout...');
     try {
       await this.fetchWithTimeout('/api/auth/logout', { method: 'POST', credentials: 'include' }, 5000);
     } catch (error) {
       console.warn('[API-CLIENT] Logout request failed, proceeding with redirect:', error);
     }
     if (typeof window !== 'undefined') {
-      console.log('[API-CLIENT] Redirecting to login...');
       multiTabSync.notifyLogout('session_expired');
       window.location.href = '/login?reason=session_expired';
     }
@@ -171,19 +165,14 @@ class ApiClient {
           
           if (errorCode === 'TOKEN_EXPIRED' || errorMessage.includes('token has expired') || errorMessage.includes('access token has expired')) {
             shouldRetryWithRefresh = true;
-            console.log(`[API-CLIENT] TOKEN_EXPIRED detected (${errorCode}), attempting refresh...`);
           } else if (errorCode === 'TOKEN_REVOKED' || errorMessage.includes('revoked')) {
-            console.log('[API-CLIENT] Token revoked, redirecting to login');
             if (!isServerSide) {
               await this.handleGracefulLogout();
             }
             throw new ApiError('Session has been revoked. Please log in again.', 401, 'SESSION_REVOKED');
-          } else {
-            console.log(`[API-CLIENT] Non-token 401 error, not refreshing. Code: ${errorCode}`);
           }
         } catch (parseError) {
           if (parseError instanceof ApiError) throw parseError;
-          console.log('[API-CLIENT] Could not parse 401 error, skipping refresh');
         }
 
         if (shouldRetryWithRefresh) {
@@ -191,14 +180,12 @@ class ApiClient {
             // Server-side: trigger refresh but don't retry in SSR context
             // The refresh will update cookies for subsequent client requests
             await attemptServerSideRefresh();
-            console.log('[API-CLIENT] Server-side refresh triggered, throwing error for client retry');
             throw new ApiError('Session expired. Please refresh the page.', 401, 'SESSION_EXPIRED');
           } else {
             // Client-side: attempt refresh and retry
             const refreshSuccess = await this.attemptTokenRefresh();
             
             if (refreshSuccess) {
-              console.log(`[API-CLIENT] Retrying original request after successful refresh (${endpoint})`);
               const retryOptions = options ? { ...options } : undefined;
               if (retryOptions && options?.body) {
                 retryOptions.body = options.body;
@@ -206,7 +193,6 @@ class ApiClient {
               // CRITICAL: Pass retryCount=1 to prevent infinite loop
               return this.request<T>(endpoint, retryOptions, 1);
             } else {
-              console.log('[API-CLIENT] Refresh failed, session expired');
               await this.handleGracefulLogout();
               throw new ApiError('Session expired. Please log in again.', 401, 'SESSION_EXPIRED');
             }
@@ -238,6 +224,10 @@ class ApiClient {
   private logError(error: ApiError, context: { url: string; method: string; status: number }): void {
     if (error.isAuthError) return;
     if (error.isNetworkError && process.env.NODE_ENV === 'development') return;
+    // Suppress 404 errors in development (e.g., unimplemented backend endpoints)
+    if (error.status === 404 && process.env.NODE_ENV === 'development') return;
+    // Suppress timeout errors in development (backend may be slow during development)
+    if (error.isTimeoutError && process.env.NODE_ENV === 'development') return;
     const sanitizedDetails = this.sanitizeErrorDetails(error.details);
     console.error('═══════════════════════════════════════════');
     console.error('API Error Details:');

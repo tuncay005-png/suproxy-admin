@@ -28,7 +28,6 @@ import { SESSION_COOKIE_CONFIG, REFRESH_COOKIE_CONFIG } from '@/lib/auth/session
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('[REFRESH-ROUTE] Token refresh request received');
     
     const cookieStore = await cookies();
     const refreshToken = cookieStore.get(REFRESH_COOKIE_CONFIG.name);
@@ -51,7 +50,6 @@ export async function POST(request: NextRequest) {
     }
 
     const backendEndpoint = `${backendUrl}/api/v1/auth/refresh`;
-    console.log('[REFRESH-ROUTE] Calling backend refresh endpoint');
 
     const backendResponse = await fetch(backendEndpoint, {
       method: 'POST',
@@ -89,8 +87,6 @@ export async function POST(request: NextRequest) {
     const data = await backendResponse.json();
     const { access_token, refresh_token } = data.data;
 
-    console.log('[REFRESH-ROUTE] Backend refresh successful, setting new cookies');
-
     const response = NextResponse.json({ success: true });
 
     response.cookies.set(
@@ -104,8 +100,6 @@ export async function POST(request: NextRequest) {
       refresh_token,
       REFRESH_COOKIE_CONFIG
     );
-
-    console.log('[REFRESH-ROUTE] New tokens set successfully');
 
     return response;
   } catch (error) {

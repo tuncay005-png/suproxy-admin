@@ -19,14 +19,14 @@ describe('DashboardLoading', () => {
     expect(skeletons.length).toBeGreaterThan(0);
   });
 
-  it('should render 4 stat card skeletons', () => {
+  it('should render 5 stat card skeletons', () => {
     render(<DashboardLoading />);
     
     // Find the statistics section
     const statsSection = screen.getByLabelText('Statistics Loading');
     expect(statsSection).toBeInTheDocument();
     
-    // Should have 4 card containers
+    // Should have 5 StatCardSkeleton components
     const cards = statsSection.querySelectorAll('[class*="card"]');
     expect(cards.length).toBeGreaterThan(0);
   });
@@ -42,12 +42,14 @@ describe('DashboardLoading', () => {
   it('should have responsive grid layout matching dashboard', () => {
     render(<DashboardLoading />);
     
-    // Find stats section with responsive classes
+    // Find stats section with responsive classes matching dashboard
+    // Dashboard uses: grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5
     const statsSection = screen.getByLabelText('Statistics Loading');
     expect(statsSection).toHaveClass('grid');
     expect(statsSection).toHaveClass('grid-cols-1');
-    expect(statsSection).toHaveClass('md:grid-cols-2');
-    expect(statsSection).toHaveClass('lg:grid-cols-4');
+    expect(statsSection).toHaveClass('sm:grid-cols-2');
+    expect(statsSection).toHaveClass('md:grid-cols-3');
+    expect(statsSection).toHaveClass('lg:grid-cols-5');
   });
 
   it('should render activity section with correct column spans', () => {

@@ -1,0 +1,185 @@
+{
+  "nav": {
+    "dashboard": "Панель управления",
+    "users": "Пользователи",
+    "sessions": "Сессии",
+    "xray_management": "Управление Xray",
+    "xray": {
+      "inbounds": "Входящие",
+      "clients": "Клиенты",
+      "nodes": "Узлы",
+      "routing": "Маршрутизация"
+    },
+    "plans": "Тарифы",
+    "logs": "Логи",
+    "monitoring": "Мониторинг"
+  },
+  "dashboard": {
+    "title": "Панель управления",
+    "description": "Добро пожаловать в административную панель",
+    "total_users": "Всего пользователей",
+    "active_users": "активных",
+    "xray_instances": "Экземпляры Xray",
+    "active_instances": "активных",
+    "servers": "Серверы",
+    "online_servers": "онлайн",
+    "plans": "Тарифы",
+    "active_plans": "активных",
+    "recent_actions": "Последние действия",
+    "xray_status": "Статус Xray",
+    "running": "Работает",
+    "stopped": "Остановлен",
+    "system_uptime": "Время работы",
+    "traffic_speed": "Скорость трафика",
+    "total_traffic": "Общий трафик",
+    "total_traffic_label": "всего",
+    "data_unavailable": "Данные недоступны",
+    "loading": "Загрузка..."
+  },
+  "monitoring": {
+    "cpu_usage": "Использование CPU",
+    "ram_usage": "Использование RAM",
+    "disk_usage": "Использование диска",
+    "swap_usage": "Использование Swap"
+  },
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "retry": "Повторить",
+    "refresh": "Обновить",
+    "search": "Поиск",
+    "cancel": "Отмена",
+    "last_updated": "Последнее обновление",
+    "data_stale": "Данные могут быть устаревшими",
+    "failed_to_load": "Не удалось загрузить данные",
+    "app_name": "Suproxy Admin",
+    "version": "Версия",
+    "coming_soon": "Скоро"
+  },
+  "xray": {
+    "inbounds": {
+      "title": "Входящие",
+      "description": "Управление конфигурациями входящих прокси Xray",
+      "add_inbound": "Добавить входящий",
+      "table": {
+        "name": "Имя",
+        "protocol": "Протокол",
+        "port": "Порт",
+        "status": "Статус"
+      },
+      "status": {
+        "enabled": "Включен",
+        "disabled": "Отключен"
+      },
+      "search_placeholder": "Поиск входящих...",
+      "empty": {
+        "title": "Входящие не настроены",
+        "description": "Создайте первую конфигурацию входящего, чтобы начать."
+      },
+      "actions": {
+        "view": "Просмотр",
+        "edit": "Редактировать",
+        "delete": "Удалить"
+      },
+      "delete_confirm": "Вы уверены, что хотите удалить входящий \"{name}\"? Это действие не может быть отменено.",
+      "delete_success_title": "Входящий удален",
+      "delete_success_description": "Входящий \"{name}\" был успешно удален.",
+      "delete_failed_title": "Ошибка удаления",
+      "delete_failed_description": "Не удалось удалить входящий"
+    },
+    "routing": {
+      "title": "Маршрутизация Xray",
+      "description": "Управление правилами маршрутизации трафика",
+      "create_rule": "Создать правило",
+      "no_rules": "Правила маршрутизации не найдены",
+      "no_rules_description": "Правила маршрутизации еще не настроены",
+      "rules_count": "правил",
+      "rule_count_singular": "правило",
+      "name": "Название",
+      "type": "Тип",
+      "action": "Действие",
+      "priority": "Приоритет",
+      "status": "Статус",
+      "actions": "Действия",
+      "enabled": "Включено",
+      "disabled": "Отключено",
+      "types": {
+        "field": "Поле",
+        "domain": "Домен",
+        "ip": "IP",
+        "port": "Порт",
+        "network": "Сеть",
+        "protocol": "Протокол"
+      },
+      "actions_types": {
+        "direct": "Прямой",
+        "block": "Блокировать",
+        "proxy": "Прокси"
+      }
+    },
+    "clients": {
+      "title": "Клиенты Xray",
+      "description": "Управление конфигурациями доступа пользователей и просмотр статистики трафика",
+      "table": {
+        "email": "Email",
+        "status": "Статус",
+        "uuid": "UUID",
+        "inbound": "Входящий",
+        "upload": "Отправлено",
+        "download": "Получено",
+        "actions": "Действия"
+      },
+      "status": {
+        "enabled": "Включен",
+        "disabled": "Отключен"
+      },
+      "empty": {
+        "title": "Клиенты Xray не найдены",
+        "description": "Пока нет конфигураций доступа клиентов"
+      },
+      "count": {
+        "clients": "клиентов",
+        "client": "клиент",
+        "configured": "настроено"
+      },
+      "actions": {
+        "regenerate_uuid": "Регенерировать UUID",
+        "reprovision": "Перенастроить",
+        "delete": "Удалить"
+      }
+    },
+    "nodes": {
+      "title": "Узлы",
+      "description": "Управление серверными узлами и их конфигурациями",
+      "table": {
+        "name": "Имя",
+        "type": "Тип",
+        "status": "Статус",
+        "server": "Сервер",
+        "cpu_usage": "Использование CPU",
+        "memory_usage": "Использование памяти",
+        "disk_usage": "Использование диска",
+        "actions": "Действия"
+      },
+      "status": {
+        "healthy": "Исправен",
+        "unhealthy": "Неисправен",
+        "unknown": "Неизвестно"
+      },
+      "type": {
+        "xray": "Xray",
+        "database": "База данных",
+        "service": "Сервис"
+      },
+      "empty": {
+        "title": "Узлы не найдены",
+        "description": "Узлы еще не настроены."
+      },
+      "actions": {
+        "view": "Просмотр",
+        "edit": "Редактировать",
+        "delete": "Удалить"
+      }
+    }
+  }
+}

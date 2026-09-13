@@ -10,6 +10,7 @@
  * - Displays email, UUID, inbound, enabled status, and traffic stats
  * - Automatic loading and error states
  * - Responsive table display
+ * - Bilingual support (English/Russian) via i18n
  * 
  * ## Data Flow
  * 
@@ -18,7 +19,7 @@
  * 3. Error boundary handles fetch failures
  * 4. Loading state shows skeleton UI during data fetch
  * 
- * Validates: Requirements 6.1, 6.2, 10.1
+ * Validates: Requirements 6.1, 6.2, 7.2, 7.6, 7.10, 10.1
  * 
  * @module app/admin/xray/clients/page
  */
@@ -27,8 +28,8 @@
 export const dynamic = 'force-dynamic';
 
 import { xrayApi } from '@/lib/api/endpoints/xray';
-import { PageHeader } from '@/components/admin/page-header';
 import { ClientsTable } from '@/components/admin/xray/clients/clients-table';
+import { ClientsPageHeader } from '@/components/admin/xray/clients/clients-page-header';
 
 /**
  * Xray clients list page - Server Component
@@ -43,10 +44,7 @@ export default async function XrayClientsPage() {
 
   return (
     <div className="space-y-4 md:space-y-6">
-      <PageHeader
-        heading="Xray Clients"
-        description="Manage individual user access configurations and view traffic statistics"
-      />
+      <ClientsPageHeader />
 
       {/* Clients table */}
       <ClientsTable clients={clients} />

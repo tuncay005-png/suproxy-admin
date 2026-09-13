@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Admin Header Component
  * 
  * Top navigation bar for the admin dashboard.
@@ -8,6 +8,7 @@
  * - User information display
  * - Logout functionality
  * - Mobile menu toggle
+ * - Language selection
  * - Responsive design
  * 
  * ## User Menu
@@ -15,7 +16,7 @@
  * Displays the current user's name and email with a logout button.
  * Logout clears the session cookie and redirects to the login page.
  * 
- * Validates: Requirements 7.4, 2.4, 2.5, 9.1, 12.1, 3.5, 7.6
+ * Validates: Requirements 7.4, 2.4, 2.5, 9.1, 12.1, 3.5, 7.6, 3.1, 3.2, 3.23
  * 
  * @module components/admin/layout/admin-header
  */
@@ -27,6 +28,7 @@ import { useRouter } from 'next/navigation';
 import { LogOut, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { LanguageSelector } from './language-selector';
 import { cn } from '@/lib/utils';
 
 export interface AdminHeaderProps {
@@ -43,12 +45,12 @@ export interface AdminHeaderProps {
 /**
  * Admin header component
  * 
- * Provides user menu, logout functionality, and mobile menu toggle.
+ * Provides user menu, logout functionality, language selection, and mobile menu toggle.
  * 
  * @example
- * ```tsx
+ * ``tsx
  * <AdminHeader onMenuClick={() => setMobileMenuOpen(true)} />
- * ```
+ * ``
  */
 export function AdminHeader({ className, onMenuClick }: AdminHeaderProps) {
   const router = useRouter();
@@ -112,6 +114,9 @@ export function AdminHeader({ className, onMenuClick }: AdminHeaderProps) {
 
         {/* User menu */}
         <div className="flex items-center gap-2">
+          {/* Language selector */}
+          <LanguageSelector />
+          
           {/* Theme toggle */}
           <ThemeToggle />
           

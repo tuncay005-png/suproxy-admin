@@ -4,85 +4,96 @@
  * This configuration supports extensibility by allowing easy addition
  * of new modules. Set disabled: true for future modules that are not
  * yet implemented.
+ * 
+ * Updated for 3X-UI transformation:
+ * - Uses labelKey instead of hardcoded title for i18n support
+ * - Expanded Xray Management submenu with Nodes and Routing
+ * - Removed Servers menu item (replaced by Nodes under Xray)
+ * - Updated icons to match 3X-UI design spec
  */
 
 import {
-  Home,
+  BarChart3,
   Users,
-  UserCheck,
-  Server,
-  CreditCard,
   FileText,
-  Network,
-  Radio,
-  Activity,
+  Rocket,
+  Download,
+  Key,
   Settings,
+  Map,
+  Package,
+  Monitor,
   type LucideIcon,
 } from "lucide-react";
 
 export interface NavigationItem {
-  title: string;
+  /** Translation key for the item label (e.g., 'nav.dashboard') */
+  labelKey: string;
+  /** Navigation href path */
   href?: string;
+  /** Lucide icon component */
   icon: LucideIcon;
+  /** Mark item as disabled (shows "Coming Soon" label) */
   disabled?: boolean;
+  /** Child items for expandable submenu */
   children?: NavigationItem[];
 }
 
 export const navigationItems: NavigationItem[] = [
   {
-    title: "Dashboard",
-    href: "/admin",
-    icon: Home,
+    labelKey: 'nav.dashboard',
+    href: '/admin',
+    icon: BarChart3,
   },
   {
-    title: "Users",
-    href: "/admin/users",
+    labelKey: 'nav.users',
+    href: '/admin/users',
     icon: Users,
   },
   {
-    title: "Sessions",
-    href: "/admin/sessions",
-    icon: UserCheck,
+    labelKey: 'nav.sessions',
+    href: '/admin/sessions',
+    icon: FileText,
   },
   {
-    title: "Xray",
-    icon: Network,
+    labelKey: 'nav.xray_management',
+    icon: Rocket,
     children: [
       {
-        title: "Instances",
-        href: "/admin/xray/instances",
-        icon: Radio,
+        labelKey: 'nav.xray.inbounds',
+        href: '/admin/xray/inbounds',
+        icon: Download,
       },
       {
-        title: "Inbounds",
-        href: "/admin/xray/inbounds",
-        icon: Activity,
+        labelKey: 'nav.xray.clients',
+        href: '/admin/xray/clients',
+        icon: Key,
       },
       {
-        title: "Clients",
-        href: "/admin/xray/clients",
-        icon: Users,
+        labelKey: 'nav.xray.nodes',
+        href: '/admin/xray/nodes',
+        icon: Settings,
+      },
+      {
+        labelKey: 'nav.xray.routing',
+        href: '/admin/xray/routing',
+        icon: Map,
       },
     ],
   },
   {
-    title: "Servers",
-    href: "/admin/servers",
-    icon: Server,
+    labelKey: 'nav.plans',
+    href: '/admin/plans',
+    icon: Package,
   },
   {
-    title: "Plans",
-    href: "/admin/plans",
-    icon: CreditCard,
-  },
-  {
-    title: "Logs",
-    href: "/admin/logs",
+    labelKey: 'nav.logs',
+    href: '/admin/logs',
     icon: FileText,
   },
   {
-    title: "Monitoring",
-    href: "/admin/monitoring",
-    icon: Settings,
+    labelKey: 'nav.monitoring',
+    href: '/admin/monitoring',
+    icon: Monitor,
   },
 ];

@@ -5,12 +5,16 @@
  * This module implements system monitoring API calls including health checks,
  * database status, Xray system status, and version information.
  * 
- * Validates: Requirements 10.1-10.10, 11.7
+ * Integrates request deduplication cache to prevent redundant API calls when
+ * multiple components poll the same endpoints simultaneously.
+ * 
+ * Validates: Requirements 10.1-10.10, 11.7, 6.7, 12.7
  */
 
 import { apiClient } from '../client';
+import { requestCache } from '../request-cache';
 import type { ApiResponse } from '@/types/api';
-import type { SystemHealth, DatabaseStatus, XraySystemStatus, VersionInfo } from '@/types/system';
+import type { SystemHealth, DatabaseStatus, XraySystemStatus, XrayStatus, VersionInfo } from '@/types/system';
 
 /**
  * System monitoring API endpoints
@@ -34,9 +38,13 @@ import type { SystemHealth, DatabaseStatus, XraySystemStatus, VersionInfo } from
  */
 export const systemApi = {
   /**
-   * Get overall system health status
+   * Get overall system health status with resource usage metrics
    * 
-   * @returns Promise resolving to system health information
+   * Returns comprehensive system health information including CPU, RAM, Disk, 
+   * Swap usage, system uptime, and database connectivity. Used by dashboard
+   * circular progress charts and system monitoring components.
+   * 
+   * @returns Promise resolving to system health information with resource metrics
    * @throws ApiError when the request fails
    * 
    * @example
@@ -45,6 +53,11 @@ export const systemApi = {
    *   const health = response.data;
    *   
    *   console.log('System status:', health.status);
+   *   console.log('CPU usage:', health.cpu_usage + '%');
+   *   console.log('RAM usage:', health.ram_used, '/', health.ram_total, 'MB');
+   *   console.log('Disk usage:', health.disk_used, '/', health.disk_total, 'GB');
+   *   console.log('Swap usage:', health.swap_used, '/', health.swap_total, 'MB');
+   *   console.log('Uptime:', health.uptime, 'seconds');
    *   console.log('Database:', health.database);
    *   console.log('Checked at:', health.timestamp);
    *   
@@ -62,7 +75,10 @@ export const systemApi = {
    * }
    */
   getHealth: (): Promise<ApiResponse<SystemHealth>> =>
-    apiClient.get<ApiResponse<SystemHealth>>('/api/admin/system/health'),
+    requestCache.fetch(
+      'system:health',
+      () => apiClient.get<ApiResponse<SystemHealth>>('/api/admin/system/health')
+    ),
 
   /**
    * Get system statistics (users, Xray instances, recent audit actions)
@@ -164,7 +180,49 @@ export const systemApi = {
    * }
    */
   getXraySystemStatus: (): Promise<ApiResponse<XraySystemStatus>> =>
-    apiClient.get<ApiResponse<XraySystemStatus>>('/api/admin/system/xray'),
+    requestCache.fetch(
+      'system:xray',
+      () => apiClient.get<ApiResponse<XraySystemStatus>>('/api/admin/system/xray')
+    ),
+
+  /**
+   * Get Xray operational status with real-time metrics
+   * 
+   * Returns detailed Xray service status including traffic statistics,
+   * uptime, and connection information for monitoring purposes.
+   * 
+   * @returns Promise resolving to Xray operational status
+   * @throws ApiError when the request fails
+   * 
+   * @example
+   * try {
+   *   const response = await systemApi.getXrayStatus();
+   *   const xrayStatus = response.data;
+   *   
+   *   console.log('Xray Status:', xrayStatus.status);
+   *   console.log('Version:', xrayStatus.version);
+   *   console.log('Traffic Speed:', xrayStatus.traffic_speed, 'bytes/s');
+   *   console.log('Total Traffic:', xrayStatus.traffic_total, 'bytes');
+   *   console.log('Active Connections:', xrayStatus.active_connections);
+   *   console.log('Uptime:', xrayStatus.uptime, 'seconds');
+   *   
+   *   if (xrayStatus.status === 'running') {
+   *     console.log('Xray is operational');
+   *   } else if (xrayStatus.status === 'stopped') {
+   *     console.log('Xray service is stopped');
+   *   } else if (xrayStatus.status === 'error') {
+   *     console.error('Xray service has errors');
+   *   }
+   * } catch (error) {
+   *   if (error instanceof ApiError) {
+   *     console.error('Failed to fetch Xray status:', error.message);
+   *   }
+   * }
+   * 
+   * Validates: Requirements 6.2, 5.1, 5.2
+   */
+  getXrayStatus: (): Promise<ApiResponse<XrayStatus>> =>
+    apiClient.get<ApiResponse<XrayStatus>>('/api/admin/system/xray/status'),
 
   /**
    * Get application version information

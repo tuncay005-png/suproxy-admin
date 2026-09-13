@@ -29,6 +29,7 @@ import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AdminNav } from './admin-nav';
 import { Button } from '@/components/ui/button';
+import { useTranslations } from '@/lib/i18n/context';
 
 export interface AdminSidebarProps {
   /**
@@ -57,6 +58,8 @@ export interface AdminSidebarProps {
  * ```
  */
 export function AdminSidebar({ className, isOpen = false, onClose }: AdminSidebarProps) {
+  const { t } = useTranslations();
+  
   // Close sidebar on escape key
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -94,7 +97,7 @@ export function AdminSidebar({ className, isOpen = false, onClose }: AdminSideba
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <span className="text-lg font-bold">S</span>
             </div>
-            <span className="text-lg">Suproxy Admin</span>
+            <span className="text-lg">{t('common.app_name')}</span>
           </Link>
           {/* Close button for mobile */}
           <Button
@@ -117,7 +120,7 @@ export function AdminSidebar({ className, isOpen = false, onClose }: AdminSideba
       {/* Footer section */}
       <div className="border-t p-4">
         <p className="text-xs text-muted-foreground">
-          Admin Dashboard v0.1.0
+          {t('common.version')} v0.1.0
         </p>
       </div>
     </>

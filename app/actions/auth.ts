@@ -17,8 +17,6 @@ export async function refreshTokenAction(): Promise<{ success: boolean }> {
       return { success: false };
     }
 
-    console.log('[REFRESH-ACTION] Attempting token refresh...');
-
     const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
     if (!backendUrl) {
       console.error('[REFRESH-ACTION] NEXT_PUBLIC_API_BASE_URL not configured');
@@ -59,8 +57,6 @@ export async function refreshTokenAction(): Promise<{ success: boolean }> {
     // Set new tokens (rotation)
     cookieStore.set(SESSION_COOKIE_CONFIG.name, access_token, SESSION_COOKIE_CONFIG);
     cookieStore.set(REFRESH_COOKIE_CONFIG.name, refresh_token, REFRESH_COOKIE_CONFIG);
-
-    console.log('[REFRESH-ACTION] Tokens refreshed successfully');
     
     return { success: true };
   } catch (error) {
@@ -86,8 +82,6 @@ export async function logoutAction(): Promise<void> {
     maxAge: 0,
     expires: new Date(0),
   });
-
-  console.log('[LOGOUT-ACTION] Cookies cleared, redirecting to login');
   
   redirect('/login');
 }

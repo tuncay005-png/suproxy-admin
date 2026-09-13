@@ -28,12 +28,9 @@ let serverRefreshPromise: Promise<boolean> | null = null;
 export async function attemptServerSideRefresh(): Promise<boolean> {
   // Single-flight: reuse existing refresh promise
   if (serverRefreshPromise) {
-    console.log('[SERVER-REFRESH] Refresh already in progress, waiting...');
     return await serverRefreshPromise;
   }
 
-  console.log('[SERVER-REFRESH] Starting server-side token refresh...');
-  
   serverRefreshPromise = executeServerRefresh();
   
   try {
@@ -54,8 +51,6 @@ async function executeServerRefresh(): Promise<boolean> {
     const nextServerUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
     const refreshUrl = `${nextServerUrl}/api/auth/refresh`;
     
-    console.log('[SERVER-REFRESH] Calling refresh endpoint:', refreshUrl);
-    
     // Import cookies to forward them to the API route
     const { cookies } = await import('next/headers');
     const cookieStore = await cookies();
@@ -71,7 +66,6 @@ async function executeServerRefresh(): Promise<boolean> {
     });
     
     if (refreshResponse.ok) {
-      console.log('[SERVER-REFRESH] Token refresh successful');
       return true;
     } else {
       console.warn('[SERVER-REFRESH] Token refresh failed with status:', refreshResponse.status);

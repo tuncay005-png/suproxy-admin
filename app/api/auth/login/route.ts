@@ -56,8 +56,6 @@ export async function POST(request: NextRequest) {
   try {
     // Parse credentials from request body
     const credentials: LoginCredentials = await request.json();
-    
-    console.log('[LOGIN-ROUTE] Received login request for:', credentials.email);
 
     // Get backend API URL from environment
     const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -71,7 +69,6 @@ export async function POST(request: NextRequest) {
 
     // Forward credentials to backend API
     const backendEndpoint = `${backendUrl}/api/v1/auth/login`;
-    console.log('[LOGIN-ROUTE] Forwarding to backend:', backendEndpoint);
     
     const backendResponse = await fetch(backendEndpoint, {
       method: 'POST',
@@ -80,8 +77,6 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify(credentials),
     });
-
-    console.log('[LOGIN-ROUTE] Backend response status:', backendResponse.status);
 
     // Handle backend errors
     if (!backendResponse.ok) {
@@ -96,8 +91,6 @@ export async function POST(request: NextRequest) {
 
     // Parse backend response
     const backendData: BackendLoginResponse = await backendResponse.json();
-    console.log('[LOGIN-ROUTE] Backend authentication successful');
-    console.log('[LOGIN-ROUTE] User:', backendData.data.user.email);
 
     // Extract access token and user data
     const { access_token, refresh_token, user } = backendData.data;
@@ -124,8 +117,6 @@ export async function POST(request: NextRequest) {
       refresh_token,
       REFRESH_COOKIE_CONFIG
     );
-
-    console.log('[LOGIN-ROUTE] Both authentication cookies set successfully');
 
     return response;
   } catch (error) {

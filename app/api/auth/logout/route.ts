@@ -69,7 +69,5 @@ export async function POST() {
     expires: new Date(0),
   });
 
-  console.log('[LOGOUT-ROUTE] Both authentication cookies cleared');
-
   return response;
 }

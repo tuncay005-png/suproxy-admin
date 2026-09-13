@@ -1,35 +1,35 @@
 import { describe, it, expect } from 'vitest';
 import { navigationItems } from './navigation';
 import {
-  Home,
+  BarChart3,
   Users,
-  UserCheck,
-  Server,
-  CreditCard,
   FileText,
-  Network,
-  Radio,
-  Activity,
+  Rocket,
+  Download,
+  Key,
   Settings,
+  Map,
+  Package,
+  Monitor,
 } from 'lucide-react';
 
 describe('navigation configuration', () => {
   describe('navigationItems array', () => {
-    it('should contain exactly 8 navigation items', () => {
-      expect(navigationItems).toHaveLength(8);
+    it('should contain exactly 7 navigation items', () => {
+      expect(navigationItems).toHaveLength(7);
     });
 
     it('should have Dashboard as the first item', () => {
       const dashboard = navigationItems[0];
-      expect(dashboard.title).toBe('Dashboard');
+      expect(dashboard.labelKey).toBe('nav.dashboard');
       expect(dashboard.href).toBe('/admin');
-      expect(dashboard.icon).toBe(Home);
+      expect(dashboard.icon).toBe(BarChart3);
       expect(dashboard.disabled).toBeUndefined();
     });
 
     it('should have Users as the second item', () => {
       const users = navigationItems[1];
-      expect(users.title).toBe('Users');
+      expect(users.labelKey).toBe('nav.users');
       expect(users.href).toBe('/admin/users');
       expect(users.icon).toBe(Users);
       expect(users.disabled).toBeUndefined();
@@ -37,71 +37,67 @@ describe('navigation configuration', () => {
 
     it('should have Sessions as the third item', () => {
       const sessions = navigationItems[2];
-      expect(sessions.title).toBe('Sessions');
+      expect(sessions.labelKey).toBe('nav.sessions');
       expect(sessions.href).toBe('/admin/sessions');
-      expect(sessions.icon).toBe(UserCheck);
+      expect(sessions.icon).toBe(FileText);
       expect(sessions.disabled).toBeUndefined();
     });
 
-    it('should have Xray section with children', () => {
+    it('should have Xray Management section with children', () => {
       const xray = navigationItems[3];
-      expect(xray.title).toBe('Xray');
-      expect(xray.icon).toBe(Network);
+      expect(xray.labelKey).toBe('nav.xray_management');
+      expect(xray.icon).toBe(Rocket);
       expect(xray.href).toBeUndefined();
       expect(xray.children).toBeDefined();
-      expect(xray.children).toHaveLength(3);
+      expect(xray.children).toHaveLength(4);
       
       // Check Xray children
-      expect(xray.children![0].title).toBe('Instances');
-      expect(xray.children![0].href).toBe('/admin/xray/instances');
-      expect(xray.children![0].icon).toBe(Radio);
+      expect(xray.children![0].labelKey).toBe('nav.xray.inbounds');
+      expect(xray.children![0].href).toBe('/admin/xray/inbounds');
+      expect(xray.children![0].icon).toBe(Download);
       
-      expect(xray.children![1].title).toBe('Inbounds');
-      expect(xray.children![1].href).toBe('/admin/xray/inbounds');
-      expect(xray.children![1].icon).toBe(Activity);
+      expect(xray.children![1].labelKey).toBe('nav.xray.clients');
+      expect(xray.children![1].href).toBe('/admin/xray/clients');
+      expect(xray.children![1].icon).toBe(Key);
       
-      expect(xray.children![2].title).toBe('Clients');
-      expect(xray.children![2].href).toBe('/admin/xray/clients');
-      expect(xray.children![2].icon).toBe(Users);
-    });
-
-    it('should have Servers enabled', () => {
-      const servers = navigationItems[4];
-      expect(servers.title).toBe('Servers');
-      expect(servers.href).toBe('/admin/servers');
-      expect(servers.icon).toBe(Server);
-      expect(servers.disabled).toBeUndefined();
+      expect(xray.children![2].labelKey).toBe('nav.xray.nodes');
+      expect(xray.children![2].href).toBe('/admin/xray/nodes');
+      expect(xray.children![2].icon).toBe(Settings);
+      
+      expect(xray.children![3].labelKey).toBe('nav.xray.routing');
+      expect(xray.children![3].href).toBe('/admin/xray/routing');
+      expect(xray.children![3].icon).toBe(Map);
     });
 
     it('should have Plans enabled', () => {
-      const plans = navigationItems[5];
-      expect(plans.title).toBe('Plans');
+      const plans = navigationItems[4];
+      expect(plans.labelKey).toBe('nav.plans');
       expect(plans.href).toBe('/admin/plans');
-      expect(plans.icon).toBe(CreditCard);
+      expect(plans.icon).toBe(Package);
       expect(plans.disabled).toBeUndefined();
     });
 
     it('should have Logs enabled', () => {
-      const logs = navigationItems[6];
-      expect(logs.title).toBe('Logs');
+      const logs = navigationItems[5];
+      expect(logs.labelKey).toBe('nav.logs');
       expect(logs.href).toBe('/admin/logs');
       expect(logs.icon).toBe(FileText);
       expect(logs.disabled).toBeUndefined();
     });
 
     it('should have Monitoring as the last item', () => {
-      const monitoring = navigationItems[7];
-      expect(monitoring.title).toBe('Monitoring');
+      const monitoring = navigationItems[6];
+      expect(monitoring.labelKey).toBe('nav.monitoring');
       expect(monitoring.href).toBe('/admin/monitoring');
-      expect(monitoring.icon).toBe(Settings);
+      expect(monitoring.icon).toBe(Monitor);
       expect(monitoring.disabled).toBeUndefined();
     });
 
     it('should have all top-level items with required properties', () => {
       navigationItems.forEach((item) => {
-        expect(item).toHaveProperty('title');
+        expect(item).toHaveProperty('labelKey');
         expect(item).toHaveProperty('icon');
-        expect(typeof item.title).toBe('string');
+        expect(typeof item.labelKey).toBe('string');
         expect(item.icon).toBeDefined();
       });
     });
@@ -140,17 +136,22 @@ describe('navigation configuration', () => {
       const disabledItems = navigationItems.filter((item) => item.disabled);
       expect(disabledItems).toHaveLength(0);
     });
+    
+    it('should not include Servers menu item (replaced by Nodes under Xray Management)', () => {
+      const hasServers = navigationItems.some((item) => item.labelKey === 'nav.servers');
+      expect(hasServers).toBe(false);
+    });
   });
 
   describe('NavigationItem type validation', () => {
     it('should validate that each item conforms to NavigationItem interface', () => {
       const validateItem = (item: typeof navigationItems[0]) => {
         // Required properties
-        expect(item.title).toBeDefined();
+        expect(item.labelKey).toBeDefined();
         expect(item.icon).toBeDefined();
         
         // Type checks
-        expect(typeof item.title).toBe('string');
+        expect(typeof item.labelKey).toBe('string');
         
         // Optional property type checks
         if (item.href !== undefined) {

@@ -11,10 +11,11 @@
  * - Displays email, UUID, inbound tag, enabled status, and traffic stats
  * - Status indicators with appropriate visual styling
  * - Traffic formatted as human-readable byte units (KB, MB, GB)
- * - Client operation actions (regenerate UUID, reprovision)
+ * - Client operation actions (regenerate UUID, reprovision, delete)
  * - Empty state when no clients exist
+ * - Bilingual support (English/Russian) via i18n
  * 
- * Validates: Requirements 6.1, 6.2, 6.6, 6.7, 10.1, 10.4, 14.1, 15.1-15.3
+ * Validates: Requirements 6.1, 6.2, 6.6, 6.7, 7.2, 7.6, 7.10, 10.1, 10.4, 14.1, 15.1-15.3
  * 
  * @module components/admin/xray/clients/clients-table
  */
@@ -35,6 +36,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { EmptyState } from '@/components/ui/empty-state';
 import { Users } from 'lucide-react';
 import { formatBytes } from '@/lib/utils/format';
+import { useTranslations } from '@/lib/i18n/context';
 import { ClientStatusBadge } from './client-status-badge';
 import { RegenerateUuidDialog } from './regenerate-uuid-dialog';
 import { ReprovisionClientDialog } from './reprovision-client-dialog';
@@ -61,6 +63,7 @@ export interface ClientsTableProps {
  * Actions:
  * - Regenerate UUID: Creates new UUID (invalidates existing configs)
  * - Reprovision: Regenerates configuration with current inbound settings
+ * - Delete: Removes client configuration
  * 
  * @example
  * ```tsx
@@ -68,6 +71,8 @@ export interface ClientsTableProps {
  * ```
  */
 export function ClientsTable({ clients }: ClientsTableProps) {
+  const { t } = useTranslations();
+
   // Show empty state if no clients exist
   if (clients.length === 0) {
     return (
@@ -75,20 +80,25 @@ export function ClientsTable({ clients }: ClientsTableProps) {
         <CardContent className="pt-6">
           <EmptyState
             icon={Users}
-            title="No Xray clients found"
-            description="There are no client access configurations yet"
+            title={t('xray.clients.empty.title')}
+            description={t('xray.clients.empty.description')}
           />
         </CardContent>
       </Card>
     );
   }
 
+  // Determine plural/singular form for client count
+  const clientCountLabel = clients.length === 1 
+    ? t('xray.clients.count.client') 
+    : t('xray.clients.count.clients');
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Xray Clients</CardTitle>
+        <CardTitle>{t('xray.clients.title')}</CardTitle>
         <CardDescription>
-          {clients.length} client{clients.length !== 1 ? 's' : ''} configured
+          {clients.length} {clientCountLabel} {t('xray.clients.count.configured')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -97,13 +107,13 @@ export function ClientsTable({ clients }: ClientsTableProps) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="min-w-[180px]">Email</TableHead>
-                <TableHead className="min-w-[100px]">Status</TableHead>
-                <TableHead className="hidden md:table-cell min-w-[180px]">UUID</TableHead>
-                <TableHead className="hidden md:table-cell min-w-[120px]">Inbound</TableHead>
-                <TableHead className="hidden lg:table-cell min-w-[100px]">Upload</TableHead>
-                <TableHead className="hidden lg:table-cell min-w-[100px]">Download</TableHead>
-                <TableHead className="min-w-[240px] text-right">Actions</TableHead>
+                <TableHead className="min-w-[180px]">{t('xray.clients.table.email')}</TableHead>
+                <TableHead className="min-w-[100px]">{t('xray.clients.table.status')}</TableHead>
+                <TableHead className="hidden md:table-cell min-w-[180px]">{t('xray.clients.table.uuid')}</TableHead>
+                <TableHead className="hidden md:table-cell min-w-[120px]">{t('xray.clients.table.inbound')}</TableHead>
+                <TableHead className="hidden lg:table-cell min-w-[100px]">{t('xray.clients.table.upload')}</TableHead>
+                <TableHead className="hidden lg:table-cell min-w-[100px]">{t('xray.clients.table.download')}</TableHead>
+                <TableHead className="min-w-[240px] text-right">{t('xray.clients.table.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

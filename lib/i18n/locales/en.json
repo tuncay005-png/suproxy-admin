@@ -1,0 +1,155 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "sessions": "Sessions",
+    "xray_management": "Xray Management",
+    "xray": {
+      "inbounds": "Inbounds",
+      "clients": "Clients",
+      "nodes": "Nodes",
+      "routing": "Routing"
+    },
+    "plans": "Plans",
+    "logs": "Logs",
+    "monitoring": "Monitoring"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Welcome to the admin dashboard",
+    "total_users": "Total Users",
+    "active_users": "active",
+    "xray_instances": "Xray Instances",
+    "active_instances": "active instances",
+    "servers": "Servers",
+    "online_servers": "online",
+    "plans": "Plans",
+    "active_plans": "active",
+    "recent_actions": "Recent Actions",
+    "xray_status": "Xray Status",
+    "running": "Running",
+    "stopped": "Stopped",
+    "system_uptime": "System Uptime",
+    "traffic_speed": "Traffic Speed",
+    "total_traffic": "Total Traffic",
+    "total_traffic_label": "total",
+    "data_unavailable": "Data unavailable",
+    "loading": "Loading..."
+  },
+  "monitoring": {
+    "cpu_usage": "CPU Usage",
+    "ram_usage": "RAM Usage",
+    "disk_usage": "Disk Usage",
+    "swap_usage": "Swap Usage"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "refresh": "Refresh",
+    "search": "Search",
+    "cancel": "Cancel",
+    "last_updated": "Last updated",
+    "data_stale": "Data may be outdated",
+    "failed_to_load": "Failed to load data",
+    "app_name": "Suproxy Admin",
+    "version": "Version",
+    "coming_soon": "Coming Soon"
+  },
+  "xray": {
+    "inbounds": {
+      "title": "Inbounds",
+      "description": "Manage Xray inbound proxy configurations",
+      "add_inbound": "Add Inbound",
+      "table": {
+        "name": "Name",
+        "protocol": "Protocol",
+        "port": "Port",
+        "status": "Status"
+      },
+      "status": {
+        "enabled": "Enabled",
+        "disabled": "Disabled"
+      },
+      "search_placeholder": "Search inbounds...",
+      "empty": {
+        "title": "No inbounds configured",
+        "description": "Create your first inbound configuration to get started."
+      },
+      "actions": {
+        "view": "View",
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "delete_confirm": "Are you sure you want to delete inbound \"{name}\"? This action cannot be undone.",
+      "delete_success_title": "Inbound deleted",
+      "delete_success_description": "Inbound \"{name}\" has been deleted successfully.",
+      "delete_failed_title": "Delete failed",
+      "delete_failed_description": "Failed to delete inbound"
+    },
+    "clients": {
+      "title": "Xray Clients",
+      "description": "Manage individual user access configurations and view traffic statistics",
+      "table": {
+        "email": "Email",
+        "status": "Status",
+        "uuid": "UUID",
+        "inbound": "Inbound",
+        "upload": "Upload",
+        "download": "Download",
+        "actions": "Actions"
+      },
+      "status": {
+        "enabled": "Enabled",
+        "disabled": "Disabled"
+      },
+      "empty": {
+        "title": "No Xray clients found",
+        "description": "There are no client access configurations yet"
+      },
+      "count": {
+        "clients": "clients",
+        "client": "client",
+        "configured": "configured"
+      },
+      "actions": {
+        "regenerate_uuid": "Regenerate UUID",
+        "reprovision": "Reprovision",
+        "delete": "Delete"
+      }
+    },
+    "nodes": {
+      "title": "Nodes",
+      "description": "Manage server nodes and their configurations",
+      "table": {
+        "name": "Name",
+        "type": "Type",
+        "status": "Status",
+        "server": "Server",
+        "cpu_usage": "CPU Usage",
+        "memory_usage": "Memory Usage",
+        "disk_usage": "Disk Usage",
+        "actions": "Actions"
+      },
+      "status": {
+        "healthy": "Healthy",
+        "unhealthy": "Unhealthy",
+        "unknown": "Unknown"
+      },
+      "type": {
+        "xray": "Xray",
+        "database": "Database",
+        "service": "Service"
+      },
+      "empty": {
+        "title": "No nodes found",
+        "description": "There are no nodes configured yet."
+      },
+      "actions": {
+        "view": "View",
+        "edit": "Edit",
+        "delete": "Delete"
+      }
+    }
+  }
+}

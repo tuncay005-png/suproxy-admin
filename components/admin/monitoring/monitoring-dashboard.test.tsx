@@ -57,6 +57,14 @@ describe('MonitoringDashboard', () => {
   // Sample data
   const mockHealth: SystemHealth = {
     status: 'healthy',
+    cpu_usage: 45,
+    ram_used: 4096,
+    ram_total: 8192,
+    disk_used: 50,
+    disk_total: 100,
+    swap_used: 0,
+    swap_total: 2048,
+    uptime: 86400,
     database: 'connected',
     timestamp: '2024-01-15T12:00:00Z',
   };

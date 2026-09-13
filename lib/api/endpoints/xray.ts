@@ -22,6 +22,10 @@ import type {
   CreateClientInput,
   XrayClientConfig,
 } from '@/types/xray';
+import type {
+  XrayRoutingRule,
+  CreateRoutingRuleInput,
+} from '@/types/xray-routing';
 
 /**
  * Xray management API endpoints
@@ -292,5 +296,81 @@ export const xrayApi = {
      */
     reprovision: (id: string): Promise<ApiResponse<XrayClient>> =>
       apiClient.post<ApiResponse<XrayClient>>(`/api/admin/xray/clients/${id}/reprovision`, {}),
+  },
+
+  /**
+   * Xray Routing Rules Management
+   * Configure and manage traffic routing rules
+   */
+  routing: {
+    /**
+     * List all routing rules
+     * 
+     * @returns Promise resolving to list of routing rules
+     * @throws ApiError when the request fails
+     */
+    list: (): Promise<ApiResponse<{ rules: XrayRoutingRule[] }>> =>
+      apiClient.get<ApiResponse<{ rules: XrayRoutingRule[] }>>('/api/admin/xray/routing'),
+
+    /**
+     * Get details for a specific routing rule
+     * 
+     * @param id Routing rule UUID
+     * @returns Promise resolving to routing rule configuration
+     * @throws ApiError when rule not found or request fails
+     */
+    getById: (id: string): Promise<ApiResponse<XrayRoutingRule>> =>
+      apiClient.get<ApiResponse<XrayRoutingRule>>(`/api/admin/xray/routing/${id}`),
+
+    /**
+     * Create a new routing rule
+     * 
+     * @param data Routing rule configuration (name, type, action, conditions)
+     * @returns Promise resolving to created routing rule
+     * @throws ApiError when creation fails (e.g., validation errors)
+     */
+    create: (data: CreateRoutingRuleInput): Promise<ApiResponse<XrayRoutingRule>> =>
+      apiClient.post<ApiResponse<XrayRoutingRule>>('/api/admin/xray/routing', data),
+
+    /**
+     * Update an existing routing rule
+     * 
+     * @param id Routing rule UUID
+     * @param data Partial routing rule configuration to update
+     * @returns Promise resolving to updated routing rule
+     * @throws ApiError when update fails
+     */
+    update: (id: string, data: Partial<CreateRoutingRuleInput>): Promise<ApiResponse<XrayRoutingRule>> =>
+      apiClient.put<ApiResponse<XrayRoutingRule>>(`/api/admin/xray/routing/${id}`, data),
+
+    /**
+     * Delete a routing rule
+     * 
+     * @param id Routing rule UUID
+     * @returns Promise resolving to success message
+     * @throws ApiError when deletion fails
+     */
+    delete: (id: string): Promise<ApiResponse<{ message: string }>> =>
+      apiClient.delete<ApiResponse<{ message: string }>>(`/api/admin/xray/routing/${id}`),
+
+    /**
+     * Enable a routing rule
+     * 
+     * @param id Routing rule UUID
+     * @returns Promise resolving to updated routing rule
+     * @throws ApiError when enable operation fails
+     */
+    enable: (id: string): Promise<ApiResponse<XrayRoutingRule>> =>
+      apiClient.put<ApiResponse<XrayRoutingRule>>(`/api/admin/xray/routing/${id}/enable`, {}),
+
+    /**
+     * Disable a routing rule
+     * 
+     * @param id Routing rule UUID
+     * @returns Promise resolving to updated routing rule
+     * @throws ApiError when disable operation fails
+     */
+    disable: (id: string): Promise<ApiResponse<XrayRoutingRule>> =>
+      apiClient.put<ApiResponse<XrayRoutingRule>>(`/api/admin/xray/routing/${id}/disable`, {}),
   },
 };

@@ -11,12 +11,21 @@
  * - Optional trend indicator (up/down with percentage)
  * - Responsive design
  * - Consistent styling with shadcn/ui Card component
+ * - ARIA labels and live regions for accessibility
+ * 
+ * ## Accessibility Features
+ * 
+ * - role="article" for semantic structure
+ * - aria-label with comprehensive metric description
+ * - aria-live region for announcing real-time updates to screen readers
+ * - Keyboard accessible when clickable (Link wrapper)
  * 
  * ## Requirements Validation
  * 
- * Validates: Requirements 3.1, 9.2
+ * Validates: Requirements 3.1, 9.2, 2.7
  * - 3.1: Reusable component for displaying statistics on dashboard
  * - 9.2: Separation of UI components from business logic
+ * - 2.7: WCAG AA contrast ratios for accessibility
  * 
  * @module components/admin/dashboard/stat-card
  */
@@ -75,6 +84,12 @@ export interface StatCardProps {
    * Optional link URL to make the card clickable
    */
   href?: string;
+
+  /**
+   * Accessible description for screen readers (optional)
+   * If not provided, defaults to "{title}: {value}"
+   */
+  ariaLabel?: string;
 }
 
 /**
@@ -111,7 +126,18 @@ export function StatCard({
   trend,
   className,
   href,
+  ariaLabel,
 }: StatCardProps) {
+  // Format value for display and accessibility
+  const formattedValue = typeof value === 'number' ? value.toLocaleString() : value;
+  
+  // Generate default aria-label if not provided
+  const defaultAriaLabel = description 
+    ? `${title}: ${formattedValue}. ${description}` 
+    : `${title}: ${formattedValue}`;
+  
+  const accessibleLabel = ariaLabel || defaultAriaLabel;
+
   const cardContent = (
     <>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -127,7 +153,7 @@ export function StatCard({
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">
-          {typeof value === 'number' ? value.toLocaleString() : value}
+          {formattedValue}
         </div>
         
         {/* Description or trend indicator */}
@@ -167,13 +193,31 @@ export function StatCard({
           )}
         </div>
       </CardContent>
+      
+      {/* Live region for real-time updates - announces changes to screen readers */}
+      <div 
+        aria-live="polite" 
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {title} updated: {formattedValue}
+        {description && `, ${description}`}
+      </div>
     </>
   );
 
   if (href) {
     return (
-      <Link href={href} className="block transition-transform hover:scale-105">
-        <Card className={cn('cursor-pointer hover:shadow-md', className)}>
+      <Link 
+        href={href} 
+        className="block transition-transform hover:scale-105"
+        aria-label={`View ${accessibleLabel}`}
+      >
+        <Card 
+          className={cn('cursor-pointer hover:shadow-md', className)}
+          role="article"
+          aria-label={accessibleLabel}
+        >
           {cardContent}
         </Card>
       </Link>
@@ -181,7 +225,11 @@ export function StatCard({
   }
 
   return (
-    <Card className={cn('', className)}>
+    <Card 
+      className={cn('', className)}
+      role="article"
+      aria-label={accessibleLabel}
+    >
       {cardContent}
     </Card>
   );

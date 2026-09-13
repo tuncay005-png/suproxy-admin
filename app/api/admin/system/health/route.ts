@@ -7,7 +7,12 @@ export async function GET(request: NextRequest) {
     if (!sessionToken) {
       return NextResponse.json(
         { success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } },
-        { status: 401 }
+        { 
+          status: 401,
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+          },
+        }
       );
     }
 
@@ -16,7 +21,12 @@ export async function GET(request: NextRequest) {
       console.error('[HEALTH-ROUTE] NEXT_PUBLIC_API_BASE_URL not configured');
       return NextResponse.json(
         { success: false, error: { code: 'CONFIG_ERROR', message: 'Server configuration error' } },
-        { status: 500 }
+        { 
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+          },
+        }
       );
     }
 
@@ -35,15 +45,29 @@ export async function GET(request: NextRequest) {
 
     if (!backendResponse.ok) {
       console.error('[HEALTH-ROUTE] Backend request failed:', responseData);
-      return NextResponse.json(responseData, { status: backendResponse.status });
+      return NextResponse.json(responseData, { 
+        status: backendResponse.status,
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+      });
     }
 
-    return NextResponse.json(responseData);
+    return NextResponse.json(responseData, {
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+    });
   } catch (error) {
     console.error('[HEALTH-ROUTE] Error:', error);
     return NextResponse.json(
       { success: false, error: { code: 'INTERNAL_ERROR', message: 'An unexpected error occurred' } },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+      }
     );
   }
 }

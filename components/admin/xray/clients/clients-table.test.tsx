@@ -6,9 +6,10 @@
  * @module components/admin/xray/clients/clients-table.test
  */
 
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import { ClientsTable } from './clients-table';
+import { I18nProvider } from '@/lib/i18n/context';
 import type { XrayClient } from '@/types/xray';
 
 // Mock the formatBytes function
@@ -21,6 +22,16 @@ vi.mock('@/lib/utils/format', () => ({
     return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
   },
 }));
+
+// Helper function to render with I18nProvider and wait for translations to load
+async function renderWithI18n(component: React.ReactElement) {
+  const result = render(<I18nProvider initialLocale="en">{component}</I18nProvider>);
+  // Wait for translations to load
+  await waitFor(() => {
+    expect(screen.queryByText('Xray Clients')).toBeInTheDocument();
+  }, { timeout: 2000 });
+  return result;
+}
 
 describe('ClientsTable', () => {
   const mockClients: XrayClient[] = [
@@ -50,15 +61,17 @@ describe('ClientsTable', () => {
     },
   ];
 
-  it('renders empty state when no clients exist', () => {
-    render(<ClientsTable clients={[]} />);
+  it('renders empty state when no clients exist', async () => {
+    render(<I18nProvider initialLocale="en"><ClientsTable clients={[]} /></I18nProvider>);
 
-    expect(screen.getByText('No Xray clients found')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('No Xray clients found')).toBeInTheDocument();
+    });
     expect(screen.getByText('There are no client access configurations yet')).toBeInTheDocument();
   });
 
-  it('renders clients table with data', () => {
-    render(<ClientsTable clients={mockClients} />);
+  it('renders clients table with data', async () => {
+    await renderWithI18n(<ClientsTable clients={mockClients} />);
 
     // Check table title and count
     expect(screen.getByText('Xray Clients')).toBeInTheDocument();
@@ -77,8 +90,8 @@ describe('ClientsTable', () => {
     expect(screen.getByText('secondary-inbound')).toBeInTheDocument();
   });
 
-  it('renders status badges correctly', () => {
-    render(<ClientsTable clients={mockClients} />);
+  it('renders status badges correctly', async () => {
+    await renderWithI18n(<ClientsTable clients={mockClients} />);
 
     // Check for enabled and disabled badges
     const enabledBadges = screen.getAllByText('Enabled');
@@ -88,8 +101,8 @@ describe('ClientsTable', () => {
     expect(disabledBadges).toHaveLength(1);
   });
 
-  it('formats traffic statistics correctly', () => {
-    render(<ClientsTable clients={mockClients} />);
+  it('formats traffic statistics correctly', async () => {
+    await renderWithI18n(<ClientsTable clients={mockClients} />);
 
     // Check if traffic is formatted (multiple instances of same values are ok)
     expect(screen.getAllByText('1.00 MB').length).toBeGreaterThan(0); // upload for client 1 and download for client 2
@@ -97,15 +110,15 @@ describe('ClientsTable', () => {
     expect(screen.getByText('512.00 KB')).toBeInTheDocument(); // upload for client 2
   });
 
-  it('renders singular client text correctly', () => {
+  it('renders singular client text correctly', async () => {
     const singleClient = [mockClients[0]];
-    render(<ClientsTable clients={singleClient} />);
+    await renderWithI18n(<ClientsTable clients={singleClient} />);
 
     expect(screen.getByText('1 client configured')).toBeInTheDocument();
   });
 
-  it('renders table headers correctly', () => {
-    render(<ClientsTable clients={mockClients} />);
+  it('renders table headers correctly', async () => {
+    await renderWithI18n(<ClientsTable clients={mockClients} />);
 
     expect(screen.getByText('Email')).toBeInTheDocument();
     expect(screen.getByText('Status')).toBeInTheDocument();

@@ -6,3 +6,5 @@ export * from "./cn";
 export * from "./format";
 export * from "./constants";
 export * from "./navigation";
+export * from "./encoding";
+export * from "./feature-detection";

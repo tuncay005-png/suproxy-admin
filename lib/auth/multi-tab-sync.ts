@@ -45,7 +45,6 @@ class MultiTabSync {
       try {
         this.channel = new BroadcastChannel('suproxy_auth_channel');
         this.useBroadcastChannel = true;
-        console.log('[MULTI-TAB-SYNC] BroadcastChannel initialized');
         
         // Listen for messages from other tabs
         this.channel.onmessage = (event: MessageEvent<AuthMessage>) => {
@@ -59,7 +58,6 @@ class MultiTabSync {
 
     // If BroadcastChannel not available, use localStorage
     if (!this.useBroadcastChannel) {
-      console.log('[MULTI-TAB-SYNC] Using localStorage fallback');
       window.addEventListener('storage', this.handleStorageEvent.bind(this));
     }
   }
@@ -68,8 +66,6 @@ class MultiTabSync {
    * Handle message from BroadcastChannel
    */
   private handleMessage(message: AuthMessage): void {
-    console.log('[MULTI-TAB-SYNC] Received message:', message.type);
-
     switch (message.type) {
       case 'token_refreshed':
         this.handleTokenRefreshed();
@@ -143,17 +139,14 @@ class MultiTabSync {
    * Handle token refreshed event
    */
   private handleTokenRefreshed(): void {
-    console.log('[MULTI-TAB-SYNC] Token refreshed in another tab');
     // In the future, could trigger UI update or notification
-    // For now, just log (new tokens are in cookies, accessible automatically)
+    // For now, new tokens are in cookies and accessible automatically
   }
 
   /**
    * Handle logout event
    */
   private handleLogout(reason?: string): void {
-    console.log('[MULTI-TAB-SYNC] Logout detected in another tab, reason:', reason);
-    
     // Redirect to login page
     if (typeof window !== 'undefined') {
       const reasonParam = reason ? `?reason=${encodeURIComponent(reason)}` : '';
@@ -165,7 +158,6 @@ class MultiTabSync {
    * Notify all tabs that token was refreshed
    */
   public notifyTokenRefreshed(): void {
-    console.log('[MULTI-TAB-SYNC] Notifying other tabs: token_refreshed');
     this.broadcast({
       type: 'token_refreshed',
       timestamp: Date.now(),
@@ -176,7 +168,6 @@ class MultiTabSync {
    * Notify all tabs that user logged out
    */
   public notifyLogout(reason?: string): void {
-    console.log('[MULTI-TAB-SYNC] Notifying other tabs: logout, reason:', reason);
     this.broadcast({
       type: 'logout',
       timestamp: Date.now(),

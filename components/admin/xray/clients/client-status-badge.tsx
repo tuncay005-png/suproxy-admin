@@ -8,8 +8,9 @@
  * - Color-coded status badges
  * - Enabled: green
  * - Disabled: gray/secondary
+ * - Bilingual support (English/Russian) via i18n
  * 
- * Validates: Requirements 6.2, 10.1
+ * Validates: Requirements 6.2, 7.10, 10.1
  * 
  * @module components/admin/xray/clients/client-status-badge
  */
@@ -18,6 +19,7 @@
 
 import * as React from 'react';
 import { Badge } from '@/components/ui/badge';
+import { useTranslations } from '@/lib/i18n/context';
 
 export interface ClientStatusBadgeProps {
   /**
@@ -36,20 +38,22 @@ export interface ClientStatusBadgeProps {
  * ```
  */
 export function ClientStatusBadge({ enabled }: ClientStatusBadgeProps) {
+  const { t } = useTranslations();
+
   if (enabled) {
     return (
       <Badge
         variant="default"
         className="bg-green-500 hover:bg-green-600 text-white whitespace-nowrap"
       >
-        Enabled
+        {t('xray.clients.status.enabled')}
       </Badge>
     );
   }
 
   return (
     <Badge variant="secondary" className="whitespace-nowrap">
-      Disabled
+      {t('xray.clients.status.disabled')}
     </Badge>
   );
 }

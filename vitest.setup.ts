@@ -14,6 +14,15 @@ global.ResizeObserver = class ResizeObserver {
   disconnect() {}
 };
 
+// Mock CSS.supports for feature detection
+if (typeof CSS === 'undefined') {
+  (global as any).CSS = {
+    supports: vi.fn(() => true),
+  };
+} else if (!CSS.supports) {
+  CSS.supports = vi.fn(() => true);
+}
+
 // Mock Next.js navigation globally
 // This provides a default mock that can be overridden in individual tests
 vi.mock('next/navigation', async () => {

@@ -1,40 +1,38 @@
 /**
- * Loading State for Xray Inbounds Page
+ * Loading state for Xray Inbounds page
  * 
- * Displays a skeleton UI while the inbounds data is being fetched.
- * 
- * @module app/admin/xray/inbounds/loading
+ * Displays skeleton UI while inbound data is being fetched
  */
 
-import { PageHeader } from '@/components/admin/page-header';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function LoadingInboundsPage() {
+export default function InboundsLoading() {
   return (
-    <div className="space-y-4 md:space-y-6">
-      <PageHeader
-        heading="Xray Inbounds"
-        description="Manage Xray inbound proxy configurations"
-      />
+    <div className="space-y-6">
+      {/* Header skeleton */}
+      <div className="space-y-2">
+        <Skeleton className="h-8 w-[200px]" />
+        <Skeleton className="h-4 w-[300px]" />
+      </div>
 
+      {/* Table skeleton */}
       <Card>
-        <CardHeader>
-          <CardTitle>Xray Inbounds</CardTitle>
-          <CardDescription>
-            <Skeleton className="h-4 w-32" />
-          </CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-[150px]" />
+            <Skeleton className="h-4 w-[250px]" />
+          </div>
+          <Skeleton className="h-9 w-[120px]" />
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          {/* Search bar skeleton */}
+          <Skeleton className="h-10 w-full" />
+          
+          {/* Table rows skeleton */}
           <div className="space-y-3">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-4">
-                <Skeleton className="h-4 w-1/6" />
-                <Skeleton className="h-4 w-1/6" />
-                <Skeleton className="h-4 w-1/4" />
-                <Skeleton className="h-6 w-20" />
-                <Skeleton className="h-4 w-1/4" />
-              </div>
+            {[...Array(5)].map((_, i) => (
+              <Skeleton key={i} className="h-16 w-full" />
             ))}
           </div>
         </CardContent>

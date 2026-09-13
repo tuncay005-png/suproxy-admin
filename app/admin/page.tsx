@@ -35,36 +35,64 @@
 export const dynamic = 'force-dynamic';
 
 import * as React from 'react';
+import NextDynamic from 'next/dynamic';
 import { PageHeader } from '@/components/admin/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatCard } from '@/components/admin/dashboard/stat-card';
-import { ActivityFeed } from '@/components/admin/dashboard/activity-feed';
 import { QuickActions } from '@/components/admin/dashboard/quick-actions';
+import { SystemMonitors } from '@/components/admin/dashboard/system-monitors';
+import { ActivitySection } from '@/components/admin/dashboard/activity-section';
 import { Users, Server, CreditCard, Activity, Network } from 'lucide-react';
 import { systemApi, serversApi, plansApi, auditApi } from '@/lib/api/endpoints';
 import type { AuditLog } from '@/types/audit';
+
+// Lazy load ActivityFeed component (below-the-fold)
+// This improves LCP (Largest Contentful Paint) by prioritizing above-the-fold content
+const ActivityFeed = NextDynamic(
+  () => import('@/components/admin/dashboard/activity-feed').then(mod => ({ default: mod.ActivityFeed })),
+  {
+    loading: () => <ActivityFeedSkeleton />,
+    // ssr: true is required in Server Components
+  }
+);
+
+/**
+ * Loading skeleton for ActivityFeed component
+ * Displayed while the lazy-loaded component is being fetched
+ */
+function ActivityFeedSkeleton() {
+  return (
+    <div className="space-y-4">
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="flex items-start gap-4">
+          {/* Icon skeleton */}
+          <div className="h-9 w-9 shrink-0 rounded-full bg-muted animate-pulse" />
+          {/* Content skeleton */}
+          <div className="flex-1 space-y-2">
+            <div className="h-4 bg-muted rounded animate-pulse w-3/4" />
+            <div className="h-3 bg-muted rounded animate-pulse w-1/2" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 /**
  * Fetch dashboard data from the backend
  * This runs server-side during page load
  */
 async function getDashboardData() {
-  const startTime = performance.now();
-  console.log('[DASHBOARD-TIMING] Starting data fetch...');
-  
   try {
-    const fetchStart = performance.now();
     // Fetch all dashboard data in parallel
-    const [stats, health, auditLogs, servers, plans] = await Promise.allSettled([
+    const [stats, health, xrayStatus, auditLogs, servers, plans] = await Promise.allSettled([
       systemApi.getStats(),
       systemApi.getHealth(),
+      systemApi.getXrayStatus(), // Add Xray status for ActivitySection
       auditApi.getLogs({ page: 1, limit: 10 }), // Get recent 10 logs
       serversApi.list(),
       plansApi.list(),
     ]);
-    
-    const fetchTime = performance.now() - fetchStart;
-    console.log(`[DASHBOARD-TIMING] Parallel fetch completed in ${fetchTime.toFixed(2)}ms`);
 
     // Log failures for debugging
     if (stats.status === 'rejected') {
@@ -72,6 +100,9 @@ async function getDashboardData() {
     }
     if (health.status === 'rejected') {
       console.error('[DASHBOARD] Failed to fetch system health:', health.reason);
+    }
+    if (xrayStatus.status === 'rejected') {
+      console.error('[DASHBOARD] Failed to fetch Xray status:', xrayStatus.reason);
     }
     if (auditLogs.status === 'rejected') {
       console.error('[DASHBOARD] Failed to fetch audit logs:', auditLogs.reason);
@@ -82,13 +113,11 @@ async function getDashboardData() {
     if (plans.status === 'rejected') {
       console.error('[DASHBOARD] Failed to fetch plans:', plans.reason);
     }
-
-    const totalTime = performance.now() - startTime;
-    console.log(`[DASHBOARD-TIMING] Total getDashboardData time: ${totalTime.toFixed(2)}ms`);
     
     return {
       stats: stats.status === 'fulfilled' ? stats.value : null,
       health: health.status === 'fulfilled' ? health.value : null,
+      xrayStatus: xrayStatus.status === 'fulfilled' ? xrayStatus.value : null,
       auditLogs: auditLogs.status === 'fulfilled' ? auditLogs.value : null,
       servers: servers.status === 'fulfilled' ? servers.value : null,
       plans: plans.status === 'fulfilled' ? plans.value : null,
@@ -96,12 +125,11 @@ async function getDashboardData() {
   } catch (error) {
     console.error('[DASHBOARD] Error fetching dashboard data:', error);
     // Return null values - dashboard will display unavailable state
-    const totalTime = performance.now() - startTime;
-    console.log(`[DASHBOARD-TIMING] Total getDashboardData time: ${totalTime.toFixed(2)}ms`);
     
     return {
       stats: null,
       health: null,
+      xrayStatus: null,
       auditLogs: null,
       servers: null,
       plans: null,
@@ -110,7 +138,7 @@ async function getDashboardData() {
 }
 
 export default async function DashboardPage() {
-  const { stats, health, auditLogs, servers, plans } = await getDashboardData();
+  const { stats, health, xrayStatus, auditLogs, servers, plans } = await getDashboardData();
 
   // Calculate values from fetched data
   // systemApi.getStats returns ApiResponse<{...}> where data contains the flat stats object
@@ -139,15 +167,25 @@ export default async function DashboardPage() {
   const recentLogs: AuditLog[] = auditLogs?.data?.logs ?? [];
 
   return (
-    <div className="space-y-4 md:space-y-6">
+    <div className="space-y-3 md:space-y-4 lg:space-y-6">
       {/* Page Header */}
       <PageHeader
         heading="Dashboard"
         description="Welcome to the admin dashboard. Monitor system statistics and recent activity."
       />
 
+      {/* System Monitors Section - Circular Progress Charts */}
+      {/* Responsive: 1 col mobile, 2 col tablet, 4 col desktop */}
+      {/* Spacing: 12px mobile (gap-3), 16px tablet (md:gap-4), 24px desktop (lg:gap-6) */}
+      <SystemMonitors initialHealth={health?.data ?? null} />
+
+      {/* Activity Section - Xray Status, Uptime, Traffic */}
+      {/* Responsive: stack vertically mobile, horizontal desktop (3 columns) */}
+      {/* Spacing: 12px mobile (gap-3), 16px tablet (md:gap-4), 24px desktop (lg:gap-6) */}
+      <ActivitySection initialXrayStatus={xrayStatus?.data ?? null} />
+
       {/* Stat Cards Section - Responsive: 1 col mobile, 2 small, 3 tablet, 5 desktop */}
-      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 md:gap-4 lg:grid-cols-5" aria-label="Statistics">
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 md:gap-4 lg:grid-cols-5 lg:gap-6" aria-label="Statistics">
         <StatCard
           title="Total Users"
           value={String(totalUsers)}
@@ -190,7 +228,7 @@ export default async function DashboardPage() {
       </section>
 
       {/* Activity Feed Section */}
-      <section className="grid gap-3 md:grid-cols-2 md:gap-4 lg:grid-cols-7" aria-label="Activity and Actions">
+      <section className="grid gap-3 md:grid-cols-2 md:gap-4 lg:grid-cols-7 lg:gap-6" aria-label="Activity and Actions">
         <Card className="col-span-full lg:col-span-4">
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
